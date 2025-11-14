@@ -1,20 +1,43 @@
 @import "tailwindcss";
 
 /* Custom Background Utilities */
+/* HEADER BACKGROUND */
 @utility header-bg {
   background:
     url("../images/header-img.png") no-repeat right top / 779px 813px,
     url("../images/bg-img-mashroom.jpg") no-repeat left 520px / 92px 169px;
 }
 
+/* MENU CONTENT BACKGROUND */
 @utility content-bg {
   background:
-    url("../images/bg-img-paprica.png") no-repeat right 388px / 108px 192px,
-    url("../images/bg-rectangle.svg") no-repeat left 273px / 1465px 952px,
-    url("../images/bg-img-brocoli.jpg") no-repeat 5% 1550px / 131px 138px;
+  url("../images/bg-img-paprica.png") no-repeat right 388px / 108px 192px,
+  url("../images/bg-rectangle.svg") no-repeat left 273px / 1465px 952px,
+  url("../images/bg-img-brocoli.jpg") no-repeat 5% 1550px / 131px 138px;
 }
 
+/* FOOTER BACKGROUND */
 @utility footer-bg {
   background:
-    url("../images/bg-rectangle.svg") no-repeat right bottom / 1456px;
+    url("../images/bg-rectangle.svg") no-repeat right bottom / 856px;
+}
+
+/* BACK ARROW ICON */
+@utility back-arrow {
+  position: relative;
+}
+
+.back-arrow::after {
+  content: "";
+  position: absolute;
+  width: 70px;
+  height: 25px;
+  background: url("/static/menus/images/back.svg") no-repeat;
+  top: 2px;
+  left: -50px;
+  transition: 0.2s all;
+}
+
+.back-arrow:hover::after {
+  left: -55px;
 }
