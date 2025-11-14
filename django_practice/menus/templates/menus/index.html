@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Costaurant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static './menus/dist/output.css' %}">
+</head>
+
+<body class="m-0 p-0 bg-white">
+
+    {# HEADER #}
+    <div id="header" class="min-w-7xl h-[814px] header-bg">
+        <div class="w-[1200px] mx-auto">
+
+            {# NAV #}
+            <div class="h-[60px] pt-[17px]">
+                <a href="{% url 'home' %}">
+                    <img src="{% static './menus/images/logo-color.svg' %}" class="m-0 p-0 border-0">
+                </a>
+            </div>
+
+            {# HEADER TEXT #}
+            <div class="mt-[228px]">
+                <p class="mb-[35px] text-[27px] tracking-[12px] text-[#333236] font-light leading-tight space-y-2">
+                    Freshly cooked with<br>
+                    <span class="font-extrabold text-[30px]">only fresh ingredients</span>
+                </p>
+
+                <h1>
+                    <img src="{% static './menus/images/header-txt.svg' %}" class="w-[370px] h-[120px]">
+                </h1>
+            </div>
+
+        </div>
+    </div>
+
+    {# CONTENT #}
+    <div id="content" class="min-w-7xl h-full content-bg">
+        <div class="w-[1200px] mx-auto">
+
+            {# TITLE #}
+            <div class="text-center">
+                <h2 class="text-[28px] font-semibold text-[#333236] tracking-[-0.1px]">
+                    Today's Menu
+                </h2>
+
+                <p class="mt-[13px] mb-[76px] text-[17px] font-semibold text-[#d71414]">
+                    July 16, 2020
+                </p>
+            </div>
+
+            {# FOOD LIST #}
+            <div class="w-[815px] mx-auto flex flex-wrap justify-between items-start">
+
+                {# FOOD ITEM #}
+                <div class="basis-[350px] pb-[146px] relative">
+                    <div class="absolute w-[30px] h-[30px] bg-[#d71414] -top-1.5 -left-1.5 z-1"></div>
+
+                    <img src="{% static './menus/images/chicken.jpg' %}" class="w-full h-full">
+
+                    <div>
+                        <h3 class="pt-10 pb-[13px] text-[23px] font-semibold text-[#333236]">
+                            Chicken
+                        </h3>
+
+                        <p class="pb-[34px] leading-normal text-[17px] text-[#333236]">
+                            A taste you’ve never experienced before.<br>
+                            Is it ribs or chicken?
+                        </p>
+
+                        <a href="#"
+                          class="px-4 py-[9px] text-[18px] font-semibold bg-[#d71414] text-white inline-block transition-all duration-300 hover:bg-[#ac1313]">
+                          View Menu
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    {# FOOTER #}
+    <div id="footer" class="min-w-7xl mt-[400px] footer-bg">
+        <div class="w-[1200px] mx-auto">
+            <div class="text-right py-9">
+                <img src="{% static './menus/images/logo-gray.svg' %}">
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
