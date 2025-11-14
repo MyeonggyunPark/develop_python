@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Costaurant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static './menus/dist/output.css' %}">
+</head>
+
+<body class="m-0 p-0 bg-white">
+
+    {# HEADER #}
+    <div id="header" class="min-w-7xl h-[814px] header-bg">
+        <div class="w-[1200px] mx-auto">
+
+            {# NAV #}
+            <div class="h-[60px] pt-[17px]">
+                <a href="{% url 'home' %}">
+                    <img src="{% static './menus/images/logo-color.svg' %}" class="m-0 p-0 border-0">
+                </a>
+            </div>
+
+            {# HEADER TEXT #}
+            <div class="mt-[228px]">
+                <p class="mb-[35px] text-[27px] tracking-[12px] text-[#333236] font-light leading-tight space-y-2">
+                    Freshly cooked with<br>
+                    <span class="font-extrabold text-[30px]">only fresh ingredients</span>
+                </p>
+
+                <h1>
+                    <img src="{% static './menus/images/header-txt.svg' %}" class="w-[370px] h-[120px]">
+                </h1>
+            </div>
+
+        </div>
+    </div>
+
+    {# CONTENT #}
+    {% block content %}
+    {% endblock content %}
+
+    {# FOOTER #}
+    <div id="footer" class="min-w-7xl mt-[400px] footer-bg">
+        <div class="w-[1200px] mx-auto">
+            <div class="text-right py-9">
+                <img src="{% static './menus/images/logo-gray.svg' %}">
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
