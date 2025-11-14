@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.17",
+    "tailwindcss": "^4.1.17"
+  },
+  "scripts": {
+    "dev": "tailwindcss -i ./menus/static/menus/css/input.css -o ./menus/static/menus/dist/output.css --watch",
+    "build": "tailwindcss ./menus/static/menus/css/input.css -o ./menus/static/menus/dist/output.css"
+  }
+}
