@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Costaurant</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static './menus/dist/output.css' %}">
+</head>
+
+<body class="m-0 p-0 bg-white font-extralight">
+
+    <!-- HEADER -->
+    <div class="min-w-7xl">
+
+        <div class="relative w-[1450px] mx-auto">
+
+            <!-- NAV -->
+            <div class="h-[60px] pt-[17px] box-border">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'menus/images/logo-color.svg' %}" class="m-0 p-0 border-0">
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="min-w-7xl h-full">
+
+        <div class="relative w-[1450px] mx-auto">
+
+            <!-- HEADER -->
+            <div class="pl-[296px]">
+
+                <h2 class="mt-[202px] mb-[58px] pl-2">
+                    <img src="{% static 'menus/images/menu-txt.svg' %}">
+                </h2>
+
+                <!-- IMAGE -->
+                <div class="absolute top-[-262px] right-0 z-[-1]">
+                    <img src="{% static 'menus/images/chicken.jpg' %}" class="w-[670px] h-[800px] object-cover object-center">
+                </div>
+
+                <!-- INFO BOX -->
+                <div class="bg-[#D71414] inline-block w-[660px] text-white py-[39px] pl-[42px] pr-0 box-border">
+
+                    <h3 class="text-[25px] font-semibold tracking-[-0.3px]">
+                        {{ name }}
+                    </h3>
+
+                    <h4 class="text-[16px] font-medium tracking-[-0.3px] text-[#f0afaf] py-2.5 pb-[33px]">
+                        {{ features }}
+                    </h4>
+
+                    <p class="text-[18px] pb-10 leading-normal">
+                        {{ description }}
+                    </p>
+
+                    <p class="text-[22px] font-medium">
+                        &euro; {{ price }}
+                    </p>
+
+                </div>
+
+                <!-- BACK BUTTON -->
+                <div class="back-arrow mt-5 ml-[355px]">
+                    <a href="{% url 'home' %}" class="relative inline-block text-[19px] font-medium text-[#69666d] transition-all duration-200 hover:text-[#333236]">
+                        돌아가기
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="min-w-7xl mt-[300px] footer-bg">
+        <div class="relative w-[1450px] mx-auto">
+            <div class="text-right py-9 pl-[1100px]">
+                <img src="{% static 'menus/images/logo-gray.svg' %}">
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
