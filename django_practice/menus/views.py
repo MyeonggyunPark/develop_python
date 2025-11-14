@@ -1,7 +1,10 @@
+from django.utils import timezone
 from django.shortcuts import render
-from django.http import HttpResponse
 
 # Create your views here.
 
 def index(requst):
-    return render(requst, "menus/index.html")
+    today = timezone.localtime().date
+    context = {"date": today}
+    
+    return render(requst, "menus/index.html", context)
