@@ -32,7 +32,6 @@ Thumbs.db
 
 # Build
 build/
-dist/
 *.egg-info/
 
 # Node modules
