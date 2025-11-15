@@ -38,26 +38,22 @@
 
                 <!-- IMAGE -->
                 <div class="absolute top-[-262px] right-0 z-[-1]">
-                    <img src="{% static 'menus/images/chicken.jpg' %}" class="w-[670px] h-[800px] object-cover object-center">
+                    <img src="{% get_static_prefix %}{{ menu.img_path }}" class="w-[670px] h-[800px] object-cover object-center">
                 </div>
 
                 <!-- INFO BOX -->
                 <div class="bg-[#D71414] inline-block w-[660px] text-white py-[39px] pl-[42px] pr-0 box-border">
 
                     <h3 class="text-[25px] font-semibold tracking-[-0.3px]">
-                        {{ name }}
+                        {{ menu.name }}
                     </h3>
 
-                    <h4 class="text-[16px] font-medium tracking-[-0.3px] text-[#f0afaf] py-2.5 pb-[33px]">
-                        {{ features }}
-                    </h4>
-
-                    <p class="text-[18px] pb-10 leading-normal">
-                        {{ description }}
+                    <p class="text-[18px] pb-10 mt-5 leading-normal">
+                        {{ menu.description }}
                     </p>
 
                     <p class="text-[22px] font-medium">
-                        &euro; {{ price }}
+                        &euro; {{ menu.price }}
                     </p>
 
                 </div>
