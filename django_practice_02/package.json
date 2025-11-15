@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.17",
+    "tailwindcss": "^4.1.17"
+  },
+  "scripts": {
+    "dev": "tailwindcss -i ./posts/static/posts/css/input.css -o ./posts/static/posts/dist/output.css --watch",
+    "build": "tailwindcss ./posts/static/posts/css/input.css -o ./posts/static/posts/dist/output.css"
+  }
+}
