@@ -4,7 +4,7 @@ from .models import Post
 # Create your views here.
 
 def index(request):
-    return render(request, "post/index.html")
+    return render(request, "posts/index.html")
 
 
 def post_list(request):
