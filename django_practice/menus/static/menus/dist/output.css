@@ -202,24 +202,6 @@
   .z-\[-1\] {
     z-index: -1;
   }
-  .container {
-    width: 100%;
-    @media (width >= 40rem) {
-      max-width: 40rem;
-    }
-    @media (width >= 48rem) {
-      max-width: 48rem;
-    }
-    @media (width >= 64rem) {
-      max-width: 64rem;
-    }
-    @media (width >= 80rem) {
-      max-width: 80rem;
-    }
-    @media (width >= 96rem) {
-      max-width: 96rem;
-    }
-  }
   .m-0 {
     margin: calc(var(--spacing) * 0);
   }
@@ -331,21 +313,11 @@
   .justify-between {
     justify-content: space-between;
   }
-  .justify-end {
-    justify-content: flex-end;
-  }
   .space-y-2 {
     :where(& > :not(:last-child)) {
       --tw-space-y-reverse: 0;
       margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
       margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
-    }
-  }
-  .space-x-2 {
-    :where(& > :not(:last-child)) {
-      --tw-space-x-reverse: 0;
-      margin-inline-start: calc(calc(var(--spacing) * 2) * var(--tw-space-x-reverse));
-      margin-inline-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-x-reverse)));
     }
   }
   .border-0 {
@@ -373,9 +345,6 @@
   .px-4 {
     padding-inline: calc(var(--spacing) * 4);
   }
-  .py-2\.5 {
-    padding-block: calc(var(--spacing) * 2.5);
-  }
   .py-9 {
     padding-block: calc(var(--spacing) * 9);
   }
@@ -400,9 +369,6 @@
   .pb-\[13px\] {
     padding-bottom: 13px;
   }
-  .pb-\[33px\] {
-    padding-bottom: 33px;
-  }
   .pb-\[34px\] {
     padding-bottom: 34px;
   }
@@ -426,9 +392,6 @@
   }
   .text-right {
     text-align: right;
-  }
-  .text-\[16px\] {
-    font-size: 16px;
   }
   .text-\[17px\] {
     font-size: 17px;
@@ -505,9 +468,6 @@
   }
   .text-\[\#d71414\] {
     color: #d71414;
-  }
-  .text-\[\#f0afaf\] {
-    color: #f0afaf;
   }
   .text-white {
     color: var(--color-white);
@@ -587,11 +547,6 @@
   inherits: false;
   initial-value: 0;
 }
-@property --tw-space-x-reverse {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
 @property --tw-border-style {
   syntax: "*";
   inherits: false;
@@ -622,7 +577,6 @@
       --tw-skew-x: initial;
       --tw-skew-y: initial;
       --tw-space-y-reverse: 0;
-      --tw-space-x-reverse: 0;
       --tw-border-style: solid;
       --tw-leading: initial;
       --tw-font-weight: initial;
