@@ -1,0 +1,24 @@
+{% extends 'posts/base.html'%}
+{% load static %}
+
+
+{% block content %}
+<section>
+
+  <h3 class="text-2xl font-semibold text-center mb-20">
+    Diary List Page - Here are all your diary entries!
+  </h3>
+
+  <div>
+    {% for post in posts %}
+      <div class="border-2 border-amber-500 p-4 my-4">
+        <h4 class="text-xl font-semibold">{{ post.title }}</h4>
+        <p class="text-gray-600 text-sm">Created at: {{ post.dt_created }}</p>
+        <p class="mt-2">{{ post.content|linebreaks }}</p>
+      </div>
+    {% empty %}
+      <p>No diary entries found.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock content %}
