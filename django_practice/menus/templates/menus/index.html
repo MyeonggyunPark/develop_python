@@ -19,29 +19,30 @@
 
         {# FOOD LIST #}
         <div class="w-[815px] mx-auto flex flex-wrap justify-between items-start">
+            
+            {% for menu in menus %}
+                {# FOOD ITEM #}
+                <div class="basis-[350px] pb-[146px] relative">
+                    <div class="absolute w-[30px] h-[30px] bg-[#d71414] -top-1.5 -left-1.5 z-1"></div>
 
-            {# FOOD ITEM #}
-            <div class="basis-[350px] pb-[146px] relative">
-                <div class="absolute w-[30px] h-[30px] bg-[#d71414] -top-1.5 -left-1.5 z-1"></div>
+                    <img src="{% get_static_prefix %}{{ menu.img_path }}" class="w-full h-full">
 
-                <img src="{% static './menus/images/chicken.jpg' %}" class="w-full h-full">
+                    <div>
+                        <h3 class="pt-10 pb-[13px] text-[23px] font-semibold text-[#333236]">
+                            {{ menu.name }}
+                        </h3>
 
-                <div>
-                    <h3 class="pt-10 pb-[13px] text-[23px] font-semibold text-[#333236]">
-                        Chicken
-                    </h3>
+                        <p class="pb-[34px] leading-normal text-[17px] text-[#333236]">
+                            {{ menu.description }}
+                        </p>
 
-                    <p class="pb-[34px] leading-normal text-[17px] text-[#333236]">
-                        A taste you’ve never experienced before.<br>
-                        Is it ribs or chicken?
-                    </p>
-
-                    <a href="{% url 'menu-detail' 'chicken' %}"
-                      class="px-4 py-[9px] text-[18px] font-semibold bg-[#d71414] text-white inline-block transition-all duration-300 hover:bg-[#ac1313]">
-                      View Menu
-                    </a>
+                        <a href="{% url 'menu-detail' menu.id %}"
+                        class="px-4 py-[9px] text-[18px] font-semibold bg-[#d71414] text-white inline-block transition-all duration-300 hover:bg-[#ac1313]">
+                        View Menu
+                        </a>
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
 
         </div>
 
