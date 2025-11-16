@@ -12,8 +12,38 @@
   <div class="border-2 border-amber-500 rounded-2xl p-4">
     <form method="post" class="flex flex-col gap-6">
       {% csrf_token %}
+
+      <div>
+        <span class="text-xl font-semibold">Title</span>
+        <p>{{ form.title }}</p>
+      </div>
       
-      {{ form.as_p }}
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <span class="text-xl font-semibold">Feeling</span>
+          <p>{{ form.feeling }}</p>
+          {% for error in form.feeling.errors %}
+            <p class="text-red-500 ml-2">{{ error }}</p>
+          {% endfor %}
+        </div>
+        
+        <div>
+          <span class="text-xl font-semibold">Feeling Point</span>
+          <p>{{ form.feeling_point }}</p>
+          {% for error in form.feeling_point.errors %}
+            <p class="text-red-500 ml-2">{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <span class="text-xl font-semibold">Content</span>
+        <p>{{ form.content }}</p>
+        {% for error in form.content.errors %}
+            <p class="text-red-500 ml-2">{{ error }}</p>
+          {% endfor %}
+      </div>
+      
 
       <div class="flex justify-end">
         <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg w-32 hover:bg-amber-600">
