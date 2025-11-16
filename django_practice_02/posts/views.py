@@ -33,7 +33,7 @@ def post_create(request):
     else:
         post_form = PostForm()
 
-    context = {"form": post_form, "create": True}
+    context = {"form": post_form, "submit_label": "Create"}
     return render(request, "posts/post_create.html", context)
 
 
@@ -48,5 +48,5 @@ def post_update(request, id):
     else:
         post_form = PostForm(instance=post)
 
-    context = {"form": post_form, "edit": True}
+    context = {"form": post_form, "submit_label": "Update"}
     return render(request, "posts/post_create.html", context)
