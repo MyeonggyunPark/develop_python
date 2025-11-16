@@ -45,11 +45,19 @@
       </div>
       
 
-      <div class="flex justify-end">
-        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg w-32 hover:bg-amber-600">
-          Create
-        </button>
-      </div>
+      {% if create %}
+        <div class="flex justify-end">
+          <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg w-32 hover:bg-amber-600">
+            Create
+          </button>
+        </div>
+      {% elif edit %}
+        <div class="flex justify-end">
+          <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg w-32 hover:bg-amber-600">
+            Update
+          </button>
+        </div>
+      {% endif %}
     </form>
   </div>
 
