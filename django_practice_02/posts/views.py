@@ -32,10 +32,9 @@ def post_create(request):
         post_form = PostForm(request.POST)
         if post_form.is_valid():
             post_form.save()
-        return redirect("post-list")
+            return redirect("post-list")
     else:    
         post_form = PostForm()
         
-        context = {"form": post_form}
-        
-        return render(request, "posts/post_create.html", context)
+    context = {"form": post_form}    
+    return render(request, "posts/post_create.html", context)
