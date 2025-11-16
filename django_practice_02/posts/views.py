@@ -29,16 +29,9 @@ def post_detail(request, id):
 
 def post_create(request):
     if request.method == "POST":
-        title = request.POST.get("title")
-        content = request.POST.get("content")
-        feeling = request.POST.get("feeling")
-        feeling_point = request.POST.get("feeling_point")
-        Post.objects.create(
-            title=title,
-            content=content,
-            feeling=feeling,
-            feeling_point=feeling_point
-        )
+        post_form = PostForm(request.POST)
+        if post_form.is_valid():
+            post_form.save()
         return redirect("post-list")
     else:    
         post_form = PostForm()
