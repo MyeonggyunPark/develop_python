@@ -9,13 +9,27 @@
     Diary Detail Page - Here is your diary entry!
   </h3>
 
-  <div class="flex justify-end px-5">
+  <div class="flex justify-end gap-5 px-5">
     <a
-    href="{% url 'post-update' post.id %}"
-    class="px-4 py-2 text-sm font-semibold text-amber-600 border border-amber-500 rounded-lg hover:bg-amber-500 hover:text-white transition-colors"
+      href="{% url 'post-update' post.id %}"
+      class="px-4 py-2 text-sm font-semibold text-amber-600 border border-amber-500 rounded-lg hover:bg-amber-500 hover:text-white transition-colors"
     >
       Edit
     </a>
+
+    <form
+      method="post"
+      action="{% url 'post-delete' post.id %}"
+      onsubmit="return confirm('Are you sure you want to delete this post?');"
+    >
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="px-4 py-2 text-sm font-semibold text-red-600 border border-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors"
+      >
+        Delete
+      </button>
+    </form>
   </div>
 
   <div class="border-2 border-amber-500 rounded-2xl p-4 mt-5">
