@@ -1,0 +1,27 @@
+{% extends 'posts/base.html'%}
+{% load static %}
+
+{% block content %}
+
+<section>
+
+  <h3 class="text-2xl font-semibold text-center mb-20">
+    Create a New Diary Entry
+  </h3>
+
+  <div class="border-2 border-amber-500 rounded-2xl p-4">
+    <form method="post" class="flex flex-col gap-6">
+      {% csrf_token %}
+      
+      {{ form.as_p }}
+
+      <div class="flex justify-end">
+        <button type="submit" class="bg-amber-500 text-white px-4 py-2 rounded-lg w-32 hover:bg-amber-600">
+          Create
+        </button>
+      </div>
+    </form>
+  </div>
+
+</section>
+{% endblock content%}
