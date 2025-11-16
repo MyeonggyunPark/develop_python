@@ -1,0 +1,33 @@
+{% extends 'posts/base.html'%}
+{% load static %}
+
+
+{% block content %}
+<section>
+
+  <h3 class="text-2xl font-semibold text-center mb-20">
+    Diary Detail Page - Here is your diary entry!
+  </h3>
+
+  <div class="border-2 border-amber-500 rounded-2xl p-4">
+    <h4 class="text-2xl font-semibold mb-2">{{ post.title }}</h4>
+
+    <div class="flex justify-between items-center mt-10 border-b border-gray-400">
+      <div class="text-lg">
+        <span class="font-semibold">Feeling:</span>
+        <span>{{ post.feeling }}</span>
+      </div>
+
+      <div class="text-lg">
+        <span class="font-semibold">Point:</span>
+        <span>{{ post.feeling_point }}</span>
+      </div>
+
+      <p class="text-gray-600 text-sm">{{ post.dt_created }}</p>
+    </div>
+
+    <div class="whitespace-pre-wrap mt-10">{{ post.content }}</div>
+  </div>
+
+</section>
+{% endblock content %}
