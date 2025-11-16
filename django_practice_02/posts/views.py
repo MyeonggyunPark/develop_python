@@ -50,3 +50,14 @@ def post_update(request, id):
 
     context = {"form": post_form, "submit_label": "Update"}
     return render(request, "posts/post_create.html", context)
+
+
+def post_delete(request, id):
+    post = Post.objects.get(id=id)
+    
+    if request.method == "POST":
+        post.delete()
+        return redirect("post-list")
+
+    context = {"post": post}
+    return render(request, "posts/post_detail.html", context)
