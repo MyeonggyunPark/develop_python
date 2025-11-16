@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Post
-from .forms import Postform
+from .forms import PostForm
 
 # Create your views here.
 
@@ -41,7 +41,7 @@ def post_create(request):
         )
         return redirect("post-list")
     else:    
-        post_form = Postform()
+        post_form = PostForm()
         
         context = {"form": post_form}
         
