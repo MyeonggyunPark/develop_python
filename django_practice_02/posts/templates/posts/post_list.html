@@ -9,16 +9,17 @@
     Diary List Page - Here are all your diary entries!
   </h3>
 
-  <div>
+  <ul>
     {% for post in posts %}
-      <div class="border-2 border-amber-500 p-4 my-4">
+    <a href="{% url 'post-detail' post.id %}">
+      <li class="border-2 border-amber-500 rounded-2xl p-4 my-4 flex justify-between hover:bg-gray-200 cursor-pointer">
         <h4 class="text-xl font-semibold">{{ post.title }}</h4>
-        <p class="text-gray-600 text-sm">Created at: {{ post.dt_created }}</p>
-        <p class="mt-2">{{ post.content|linebreaks }}</p>
-      </div>
+        <p class="text-gray-600 text-sm flex items-center">{{ post.dt_created }}</p>
+      </li>
+    </a>
     {% empty %}
       <p>No diary entries found.</p>
     {% endfor %}
-  </div>
+  </ul>
 </section>
 {% endblock content %}
