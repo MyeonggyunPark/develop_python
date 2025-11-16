@@ -9,7 +9,16 @@
     Diary Detail Page - Here is your diary entry!
   </h3>
 
-  <div class="border-2 border-amber-500 rounded-2xl p-4">
+  <div class="flex justify-end px-5">
+    <a
+    href="{% url 'post-update' post.id %}"
+    class="px-4 py-2 text-sm font-semibold text-amber-600 border border-amber-500 rounded-lg hover:bg-amber-500 hover:text-white transition-colors"
+    >
+      Edit
+    </a>
+  </div>
+
+  <div class="border-2 border-amber-500 rounded-2xl p-4 mt-5">
     <h4 class="text-2xl font-semibold mb-2">{{ post.title }}</h4>
 
     <div class="flex justify-between items-center mt-10 border-b border-gray-400">
@@ -22,11 +31,21 @@
         <span class="font-semibold">Point:</span>
         <span>{{ post.feeling_point }}</span>
       </div>
-
-      <p class="text-gray-600 text-sm">{{ post.dt_created }}</p>
+      
+      <div class="text-lg">
+        <span class="font-semibold">Created:</span>
+        <span class="text-gray-600">{{ post.dt_created }}</span>
+      </div>
     </div>
 
     <div class="whitespace-pre-wrap mt-10">{{ post.content }}</div>
+
+    {% if post.is_updated %}
+    <div class="text-sm text-gray-500 mt-4 flex justify-end">
+      <span class="font-semibold">Last Updated:</span>
+      <span>{{ post.dt_updated }}</span>
+    </div>
+    {% endif %}
   </div>
 
 </section>
