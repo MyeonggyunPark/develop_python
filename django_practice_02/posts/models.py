@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, MinLengthValidator
 from .validators import validate_feeling_text
+from datetime import timedelta
+
 # Create your models here.
 
 
@@ -17,7 +19,10 @@ class Post(models.Model):
     )
     dt_created = models.DateTimeField(auto_now_add=True)
     dt_updated = models.DateTimeField(auto_now=True)
-    
+
+    def is_updated(self):
+        return (self.dt_updated - self.dt_created) > timedelta(seconds=1)
+
     def __str__(self):
         return self.title
     
