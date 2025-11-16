@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Post
 from .forms import Postform
 
@@ -28,8 +28,21 @@ def post_detail(request, id):
 
 
 def post_create(request):
-    post_form = Postform()
-    
-    context = {"form": post_form}
-    
-    return render(request, "posts/post_create.html", context)
+    if request.method == "POST":
+        title = request.POST.get("title")
+        content = request.POST.get("content")
+        feeling = request.POST.get("feeling")
+        feeling_point = request.POST.get("feeling_point")
+        Post.objects.create(
+            title=title,
+            content=content,
+            feeling=feeling,
+            feeling_point=feeling_point
+        )
+        return redirect("post-list")
+    else:    
+        post_form = Postform()
+        
+        context = {"form": post_form}
+        
+        return render(request, "posts/post_create.html", context)
