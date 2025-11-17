@@ -3,7 +3,7 @@ from posts import views
 
 
 urlpatterns = [
-    path("", views.index, name="home"),
+    path("", views.PostIndexView.as_view(), name="home"),
     path("posts/", views.PostListView.as_view(), name="post-list"),
     path("posts/new/", views.PostCreateView.as_view(), name="post-create"),
     path("posts/detail/<int:id>/", views.PostDetailView.as_view(), name="post-detail"),
