@@ -10,57 +10,61 @@
   </h3>
 
   <ul>
-    {% for post in page.object_list %}
-    <a href="{% url 'post-detail' post.id %}">
-      <li class="border-2 border-amber-500 rounded-2xl p-4 my-4 flex justify-between hover:bg-gray-200 cursor-pointer">
-        <h4 class="text-xl font-semibold">{{ post.title }}</h4>
-        <p class="text-gray-600 text-sm flex items-center">{{ post.dt_created }}</p>
-      </li>
-    </a>
+    {% for post in posts %}
+      <a href="{% url 'post-detail' post.id %}">
+        <li class="border-2 border-amber-500 rounded-2xl p-4 my-4 flex justify-between hover:bg-gray-200 cursor-pointer">
+          <h4 class="text-xl font-semibold">{{ post.title }}</h4>
+          <p class="text-gray-600 text-sm flex items-center">{{ post.dt_created }}</p>
+        </li>
+      </a>
     {% empty %}
-    <p>No diary entries found.</p>
+      <p>No diary entries found.</p>
     {% endfor %}
   </ul>
 
   <div class="flex justify-center items-center mt-8 gap-4">
-    {% if page.has_previous %}
-      <a
-        href="?page=1"
-        class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
-      >
-        <i class="fa-solid fa-angles-left"></i>
-        <span>First</span>
-      </a>
+    {% if is_paginated %}
 
-      <a
-        href="?page={{ page.previous_page_number }}"
-        class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
-      >
-        <i class="fa-solid fa-chevron-left"></i>
-        <span>Prev</span>
-      </a>
-    {% endif %}
+      {% if page_obj.has_previous %}
+        <a
+          href="?page=1"
+          class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
+        >
+          <i class="fa-solid fa-angles-left"></i>
+          <span>First</span>
+        </a>
 
-    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-100">
-      {{ page.number }} / {{ page.paginator.num_pages }}
-    </span>
+        <a
+          href="?page={{ page_obj.previous_page_number }}"
+          class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
+        >
+          <i class="fa-solid fa-chevron-left"></i>
+          <span>Prev</span>
+        </a>
+      {% endif %}
 
-    {% if page.has_next %}
-      <a
-        href="?page={{ page.next_page_number }}"
-        class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
-      >
-        <span>Next</span>
-        <i class="fa-solid fa-chevron-right"></i>
-      </a>
+      <span class="px-4 py-2 text-sm font-semibold rounded-full bg-amber-100">
+        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      </span>
 
-      <a
-        href="?page={{ page.paginator.num_pages }}"
-        class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
-      >
-        <span>Last</span>
-        <i class="fa-solid fa-angles-right"></i>
-      </a>
+      {% if page_obj.has_next %}
+        <a
+          href="?page={{ page_obj.next_page_number }}"
+          class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
+        >
+          <span>Next</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+
+        <a
+          href="?page={{ page_obj.paginator.num_pages }}"
+          class="px-3 py-2 rounded-full border border-gray-300 text-sm flex items-center gap-2 hover:bg-gray-100"
+        >
+          <span>Last</span>
+          <i class="fa-solid fa-angles-right"></i>
+        </a>
+      {% endif %}
+
     {% endif %}
   </div>
 </section>
