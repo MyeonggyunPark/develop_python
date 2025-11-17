@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 # from django.core.paginator import Paginator
 # from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, UpdateView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 
 from .models import Post
 from .forms import PostForm
@@ -116,12 +116,21 @@ class PostUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy("post-detail", kwargs={"id": self.object.id})
 
-def post_delete(request, id):
-    post = get_object_or_404(Post, id=id)    
+# def post_delete(request, id):
+#     post = get_object_or_404(Post, id=id)    
 
-    if request.method == "POST":
-        post.delete()
-        return redirect("post-list")
+#     if request.method == "POST":
+#         post.delete()
+#         return redirect("post-list")
 
-    context = {"post": post}
-    return render(request, "posts/post_detail.html", context)
+#     context = {"post": post}
+#     return render(request, "posts/post_detail.html", context)
+
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = "posts/post_detail.html"
+    pk_url_kwarg = "id"
+        
+    def get_success_url(self):
+        return reverse_lazy("post-list")
+    
