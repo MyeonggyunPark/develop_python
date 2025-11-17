@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+# from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 # from django.core.paginator import Paginator
 # from django.views import View
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView, TemplateView
 
 from .models import Post
 from .forms import PostForm
@@ -10,9 +10,11 @@ from .forms import PostForm
 # Create your views here.
 
 
-def index(request):
-    return render(request, "posts/index.html")
+# def index(request):
+#     return render(request, "posts/index.html")
 
+class PostIndexView(TemplateView):
+    template_name = "posts/index.html"
 
 # def post_list(request):
 #     posts = Post.objects.all().order_by("-dt_created")
