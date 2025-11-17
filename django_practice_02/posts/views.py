@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 # from django.core.paginator import Paginator
 # from django.views import View
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, UpdateView
 
 from .models import Post
 from .forms import PostForm
@@ -88,20 +88,33 @@ class PostCreateView(CreateView):
         return reverse_lazy("post-detail", kwargs={"id": self.object.id})
 
 
-def post_update(request, id):
-    post = get_object_or_404(Post, id=id)
+# def post_update(request, id):
+#     post = get_object_or_404(Post, id=id)
 
-    if request.method == "POST":
-        post_form = PostForm(request.POST, instance=post)
-        if post_form.is_valid():
-            post_form.save()
-            return redirect("post-detail", id=post.id)
-    else:
-        post_form = PostForm(instance=post)
+#     if request.method == "POST":
+#         post_form = PostForm(request.POST, instance=post)
+#         if post_form.is_valid():
+#             post_form.save()
+#             return redirect("post-detail", id=post.id)
+#     else:
+#         post_form = PostForm(instance=post)
 
-    context = {"form": post_form, "submit_label": "Update"}
-    return render(request, "posts/post_create.html", context)
+#     context = {"form": post_form, "submit_label": "Update"}
+#     return render(request, "posts/post_create.html", context)
 
+class PostUpdateView(UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = "posts/post_create.html"
+    pk_url_kwarg = "id"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["submit_label"] = "Update"
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy("post-detail", kwargs={"id": self.object.id})
 
 def post_delete(request, id):
     post = get_object_or_404(Post, id=id)    
