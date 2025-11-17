@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator
+
 from .models import Post
 from .forms import PostForm
 
@@ -10,10 +12,16 @@ def index(request):
 
 
 def post_list(request):
-
     posts = Post.objects.all().order_by("-dt_created")
-    context = {"posts": posts}
+    paginator = Paginator(posts, 5)
+    curr_page_number = request.GET.get("page")
 
+    if curr_page_number is None:
+        curr_page_number = 1
+
+    page = paginator.get_page(curr_page_number)
+
+    context = {"page": page}
     return render(request, "posts/post_list.html", context)
 
 
