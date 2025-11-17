@@ -11,7 +11,7 @@ def index(request):
 
 def post_list(request):
 
-    posts = Post.objects.all()
+    posts = Post.objects.all().order_by("-dt_created")
     context = {"posts": posts}
 
     return render(request, "posts/post_list.html", context)
