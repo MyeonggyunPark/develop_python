@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 # from django.core.paginator import Paginator
 # from django.views import View
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, DetailView
 
 from .models import Post
 from .forms import PostForm
@@ -35,12 +35,18 @@ class PostListView(ListView):
     paginate_by = 5
     page_kwarg = "page"
 
-def post_detail(request, id):
-    post = get_object_or_404(Post, id=id)
-    context = {"post": post}
 
-    return render(request, "posts/post_detail.html", context)
+# def post_detail(request, id):
+#     post = get_object_or_404(Post, id=id)
+#     context = {"post": post}
 
+#     return render(request, "posts/post_detail.html", context)
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "posts/post_detail.html"
+    context_object_name = "post"
+    pk_url_kwarg = "id"
 
 # def post_create(request):
 #     if request.method == "POST":
