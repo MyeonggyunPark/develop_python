@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.core.paginator import Paginator
+# from django.views import View
+from django.views.generic import CreateView
 
 from .models import Post
 from .forms import PostForm
@@ -32,17 +35,44 @@ def post_detail(request, id):
     return render(request, "posts/post_detail.html", context)
 
 
-def post_create(request):
-    if request.method == "POST":
-        post_form = PostForm(request.POST)
-        if post_form.is_valid():
-            post_form.save()
-            return redirect("post-list")
-    else:
-        post_form = PostForm()
+# def post_create(request):
+#     if request.method == "POST":
+#         post_form = PostForm(request.POST)
+#         if post_form.is_valid():
+#             post_form.save()
+#             return redirect("post-list")
+#     else:
+#         post_form = PostForm()
 
-    context = {"form": post_form, "submit_label": "Create"}
-    return render(request, "posts/post_create.html", context)
+#     context = {"form": post_form, "submit_label": "Create"}
+#     return render(request, "posts/post_create.html", context)
+
+# class PostCreateView(View):
+#     def get(self, request):
+#         post_form = PostForm()
+#         context = {"form": post_form, "submit_label": "Create"}
+#         return render(request, "posts/post_create.html", context)
+    
+#     def post(self, request):
+#         post_form = PostForm(request.POST)
+#         if post_form.is_valid():
+#             post_form.save()
+#             return redirect("post-detail", id=post_form.instance.id)
+#         context = {"form": post_form, "submit_label": "Create"}
+#         return render(request, "posts/post_create.html", context)
+
+class PostCreateView(CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = "posts/post_create.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["submit_label"] = "Create"
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy("post-detail", kwargs={"id": self.object.id})
 
 
 def post_update(request, id):
