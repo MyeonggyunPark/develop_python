@@ -1,0 +1,11 @@
+[project]
+name = "lme-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13.9"
+dependencies = [
+    "chainlit>=2.9.2",
+    "openai>=2.8.1",
+    "python-dotenv>=1.2.1",
+]
