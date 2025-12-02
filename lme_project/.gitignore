@@ -22,3 +22,6 @@ env/
 # Mac / Windows Systemdateien | 맥 / 윈도우 시스템 파일
 .DS_Store
 Thumbs.db
+
+# Datenbank | 데이터베이스
+*.db
