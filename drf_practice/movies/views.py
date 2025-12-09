@@ -7,11 +7,15 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Movie, Review
 from .serializers import MovieSerializer, ReviewSerializer
 
+
 # Create your views here.
+class MoviePageNumberPagination(PageNumberPagination):
+    page_size = 2
 
 
 # @api_view(["GET", "POST"])
@@ -44,7 +48,7 @@ from .serializers import MovieSerializer, ReviewSerializer
 class MovieList(ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-
+    pagination_class = MoviePageNumberPagination
 
 # @api_view(["GET", "PATCH", "PUT", "DELETE"])
 # def movie_detail(request, pk):
