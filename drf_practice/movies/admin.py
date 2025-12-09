@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Movie
+from .models import Movie, Review
 
 # Register your models here.
 
@@ -7,3 +7,9 @@ from .models import Movie
 class MovieAdmin(admin.ModelAdmin):
     list_display = ("name", "opening_date", "running_time")
     ordering = ("-opening_date",)
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ("username", "movie", "star", "comment", "created")
+    ordering = ("-created",)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie
+from .models import Movie, Review
 
 
 class MovieSerializer(serializers.Serializer):
@@ -19,3 +19,12 @@ class MovieSerializer(serializers.Serializer):
         instance.overview = validated_data.get("overview", instance.overview)
         instance.save()
         return instance
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "movie", "username", "star", "comment", "created"]
+        extra_kwargs = {
+            "movie": {"read_only": True},
+        }
