@@ -11,4 +11,6 @@ router.register(r"orders", views.OrderViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("login/", views.CustomLoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
 ]
