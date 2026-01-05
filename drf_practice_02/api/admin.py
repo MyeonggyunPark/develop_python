@@ -3,8 +3,8 @@ from .models import CustomUser, Product, Order, OrderItem
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-    search_fields = ('username', 'email', 'first_name', 'last_name')
+    list_display = ('nickname', 'email', 'gender', 'is_staff')
+    search_fields = ('nickname', 'email', 'gender')
     
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

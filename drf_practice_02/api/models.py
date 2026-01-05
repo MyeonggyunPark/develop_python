@@ -6,7 +6,18 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class CustomUser(AbstractUser):
-    pass
+    
+    class GenderChoices(models.TextChoices):
+        MALE = ('M', 'Male')
+        FEMALE = ('F', 'Female')
+
+    nickname = models.CharField(max_length=30, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    gender = models.CharField(max_length=1, choices=GenderChoices.choices, null=True, blank=True)
+    
+    
+    def __str__(self):
+        return self.nickname
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
