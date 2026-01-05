@@ -37,15 +37,16 @@ ALLOWED_HOSTS = hosts.split(",") if hosts else []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'rest_framework',
-    'api.apps.ApiConfig',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "api.apps.ApiConfig",
 ]
 
 AUTH_USER_MODEL = 'api.CustomUser'
@@ -129,3 +130,10 @@ STATIC_URL = 'static/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication", 
+        "rest_framework.authentication.SessionAuthentication", 
+    ],
+}
