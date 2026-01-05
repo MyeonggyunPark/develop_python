@@ -1,11 +1,33 @@
 from django.contrib import admin
+from django. contrib.auth.admin import UserAdmin
 from .models import CustomUser, Product, Order, OrderItem
 
 @admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        (
+            "Personal info",
+            {"fields": ("nickname", "email", "gender")},
+        ), 
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
+    )
+
     list_display = ('nickname', 'email', 'gender', 'is_staff')
     search_fields = ('nickname', 'email', 'gender')
-    
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'stock', 'in_stock', 'created_at', 'updated_at')
