@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class CustomUser(AbstractUser):
-    
+
     class GenderChoices(models.TextChoices):
         MALE = ('M', 'Male')
         FEMALE = ('F', 'Female')
@@ -14,10 +14,9 @@ class CustomUser(AbstractUser):
     nickname = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=1, choices=GenderChoices.choices, null=True, blank=True)
-    
-    
+
     def __str__(self):
-        return self.nickname
+        return self.nickname or self.username
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -34,7 +33,7 @@ class Product(models.Model):
         
     def __str__(self):
         return self.name
-    
+
 class Order(models.Model):
     class StatusChoices(models.TextChoices):
         PENDING = ('PENDING', 'Pending')
@@ -51,7 +50,7 @@ class Order(models.Model):
     
     def __str__(self):
         return f"Order {self.order_id} by {self.user.username}"
-    
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_items")
