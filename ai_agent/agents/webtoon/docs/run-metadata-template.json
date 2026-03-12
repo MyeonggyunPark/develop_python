@@ -1,0 +1,42 @@
+{
+  "week_key": "2026-W11",
+  "run_id": "2026-W11-run-001",
+  "attempt_no": 1,
+  "is_active": false,
+  "status": "script_generated",
+  "topic": "독일 마트에서 병 보증금 환불하기",
+  "prompt_version": "prompt-bundle-v1",
+  "system_prompt_version": "system_prompt_v1",
+  "style_prompt_version": "style_prompt_v1",
+  "topic_prompt_version": "topic_prompt_v1",
+  "generator_model": "image-model-name",
+  "generator_model_version": "v1",
+  "generator_params": {
+    "size": "1080x1350",
+    "seed": 42,
+    "style_strength": 0.8
+  },
+  "ocr_model": "easyocr",
+  "ocr_model_version": "v1",
+  "correction_model": "llm-model-name",
+  "correction_model_version": "v1",
+  "character_reference_files": [
+    "assets/characters/black_cat.png",
+    "assets/characters/gray_cat.png",
+    "assets/characters/character_sheet.png"
+  ],
+  "script_file": "script_v1.json",
+  "image_files": [
+    "panel_1_base.png",
+    "panel_2_base.png",
+    "panel_3_base.png",
+    "panel_4_base.png",
+    "webtoon_v1.png"
+  ],
+  "correction_file": "text_corrections_v1.json",
+  "diff_file": "text_diff_v1.json",
+  "publish_result_file": null,
+  "created_at": "2026-03-12T09:00:00+01:00",
+  "updated_at": "2026-03-12T09:15:00+01:00",
+  "notes": "Run metadata template for weekly webtoon generation."
+}
