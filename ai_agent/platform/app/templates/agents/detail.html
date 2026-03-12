@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="detail-hero">
+  <article class="card detail-hero-main">
+    <div class="section-kicker">Agent Overview</div>
+    <h2>{{ agent.agent_name }}</h2>
+    <p>{{ agent.description }}</p>
+    <div class="detail-stats">
+      <div class="mini-stat">
+        <div class="mini-label">Status</div>
+        <div class="mini-value"><span class="badge">{{ status_labels.get(agent.status, agent.status) }}</span></div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-label">Last Run</div>
+        <div class="mini-value">{{ agent.last_run_at }}</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-label">Cost 30d</div>
+        <div class="mini-value">${{ "%.2f"|format(cost_total) }}</div>
+      </div>
+      <div class="mini-stat">
+        <div class="mini-label">Runs 7d</div>
+        <div class="mini-value">{{ agent.run_count_7d }}</div>
+      </div>
+    </div>
+    <div class="button-row">
+      <a class="button" href="/agents/{{ agent.agent_slug }}/runs">View Run History</a>
+      <button class="button button-secondary" type="button">Run Now</button>
+    </div>
+  </article>
+  <article class="card detail-side-card">
+    <div class="card-head">
+      <h2>Recent Run</h2>
+      <span class="subtle-tag">Live</span>
+    </div>
+    {% if latest_run %}
+    <div class="stack-list">
+      <div><strong>Run ID</strong><div><a href="/runs/{{ latest_run.run_id }}">{{ latest_run.run_id }}</a></div></div>
+      <div><strong>Status</strong><div><span class="badge">{{ status_labels.get(latest_run.status, latest_run.status) }}</span></div></div>
+      <div><strong>Trigger</strong><div>{{ trigger_labels.get(latest_run.trigger_type, latest_run.trigger_type) }}</div></div>
+    </div>
+    {% else %}
+    <p class="muted">실행 이력이 없습니다.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>Latest Artifacts</h2>
+    <span class="subtle-tag">Latest Output</span>
+  </div>
+  <ul class="artifact-list">
+    {% for artifact in artifacts %}
+    <li>
+      <div>
+        <strong>{{ artifact.artifact_name }}</strong>
+        <div class="muted">{{ artifact.artifact_type }} v{{ artifact.version }}</div>
+      </div>
+      <a class="artifact-link" href="{{ artifact.file_url }}">Open</a>
+    </li>
+    {% else %}
+    <li class="muted">산출물이 없습니다.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

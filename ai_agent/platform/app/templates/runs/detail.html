@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="detail-hero">
+  <article class="card detail-hero-main">
+    <div class="section-kicker">Run Summary</div>
+    <h2>Run Summary</h2>
+    <ul class="stack-list">
+      <li><strong>Run ID:</strong> {{ run.run_id }}</li>
+      <li><strong>Agent:</strong> {{ run.agent_name }}</li>
+      <li><strong>Status:</strong> <span class="badge">{{ status_labels.get(run.status, run.status) }}</span></li>
+      <li><strong>Started At:</strong> {{ run.started_at }}</li>
+      <li><strong>Ended At:</strong> {{ run.ended_at or "-" }}</li>
+      <li><strong>Cost:</strong> ${{ "%.2f"|format(run.total_cost) }}</li>
+    </ul>
+  </article>
+  <article class="card detail-side-card">
+    <div class="card-head">
+      <h2>Error Info</h2>
+      <span class="subtle-tag">Debug</span>
+    </div>
+    <ul class="stack-list">
+      <li><strong>Stage:</strong> {{ run.error_stage or "-" }}</li>
+      <li><strong>Type:</strong> {{ run.error_type or "-" }}</li>
+      <li><strong>Message:</strong> {{ run.error_message or "-" }}</li>
+    </ul>
+  </article>
+</section>
+
+<section class="two-column">
+  <article class="card">
+    <div class="card-head">
+      <h2>Logs</h2>
+      <span class="subtle-tag">Timeline</span>
+    </div>
+    <ul class="timeline-list">
+      {% for log in logs %}
+      <li>
+        <span class="timeline-dot"></span>
+        <div>
+          <div class="timeline-head">
+            <strong>{{ log.stage }}</strong>
+            <span class="badge">{{ status_labels.get(log.status, log.status) }}</span>
+          </div>
+          <div class="muted">{{ log.message }}</div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </article>
+  <article class="card">
+    <div class="card-head">
+      <h2>Artifacts</h2>
+      <span class="subtle-tag">Artifacts</span>
+    </div>
+    <ul class="artifact-list">
+      {% for artifact in artifacts %}
+      <li>
+        <div>
+          <strong>{{ artifact.artifact_name }}</strong>
+          <div class="muted">{{ artifact.artifact_type }}</div>
+        </div>
+        <a class="artifact-link" href="{{ artifact.file_url }}">Open</a>
+      </li>
+      {% else %}
+      <li class="muted">산출물이 없습니다.</li>
+      {% endfor %}
+    </ul>
+  </article>
+</section>
+{% endblock %}

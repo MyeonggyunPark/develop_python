@@ -1,0 +1,1 @@
+"""Platform web application package."""
