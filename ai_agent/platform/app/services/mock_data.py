@@ -8,7 +8,7 @@ AGENTS = [
         "agent_id": "agent-webtoon-001",
         "agent_slug": "webtoon",
         "agent_name": "웹툰 자동화 에이전트",
-        "description": "독일생활 고양이 네컷 웹툰 자동화 에이전트",
+        "description": "콜라/제로의 독일생활",
         "status": "active",
         "is_enabled": True,
         "last_run_at": "2026-03-12 09:20",
@@ -240,10 +240,10 @@ def get_dashboard_context() -> dict:
 
     return {
         "summary_cards": [
-            {"label": "Active Agents", "value": active_agents, "delta": "1 online"},
-            {"label": "Runs 7d", "value": total_runs, "delta": "+2 vs prev"},
-            {"label": "Failed 7d", "value": len(failed_runs), "delta": "-1 vs prev"},
-            {"label": "Cost 7d", "value": f"${total_cost:.2f}", "delta": "+8%"},
+            {"label": "활성 에이전트", "value": active_agents, "delta": "현재 1개 운영 중"},
+            {"label": "최근 7일 실행 수", "value": total_runs, "delta": "지난주 대비 2건 증가"},
+            {"label": "최근 7일 실패 수", "value": len(failed_runs), "delta": "지난주 대비 1건 감소"},
+            {"label": "최근 7일 비용", "value": f"${total_cost:.2f}", "delta": "지난주 대비 8% 증가"},
         ],
         "recent_runs": RUNS[:5],
         "failed_runs": failed_runs,

@@ -9,6 +9,7 @@ export type Agent = {
   agent_slug: string;
   agent_name: string;
   description: string;
+  image_url?: string;
   status: string;
   is_enabled: boolean;
   last_run_at: string;
@@ -44,6 +45,13 @@ export type RunLog = {
   status: string;
   message: string;
   duration_ms: number;
+};
+
+export type WorkspaceLog = {
+  stage: string;
+  status: string;
+  message: string;
+  timestamp: string;
 };
 
 export type CostRow = {
@@ -98,6 +106,36 @@ export type AgentDetailResponse = {
   latest_run: Run | null;
   cost_total: number;
   artifacts: Artifact[];
+};
+
+export type ScriptPanel = {
+  panel_no: number;
+  title: string;
+  dialogue: string;
+  summary: string;
+};
+
+export type AgentWorkspace = {
+  agent_slug: string;
+  week_key: string;
+  run_id: string;
+  status: string;
+  topic: string | null;
+  recommendations: string[];
+  script: {
+    version: number;
+    title: string;
+    caption: string;
+    panels: ScriptPanel[];
+  } | null;
+  artifacts: Artifact[];
+  logs: WorkspaceLog[];
+  started_at: string;
+  updated_at: string;
+};
+
+export type AgentWorkspaceResponse = {
+  workspace: AgentWorkspace | null;
 };
 
 export type RunDetailResponse = {

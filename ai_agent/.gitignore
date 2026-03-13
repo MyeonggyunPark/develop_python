@@ -38,3 +38,4 @@ dist/
 
 # Node modules
 node_modules/
+platform/app/data/*.json
