@@ -7,8 +7,7 @@ router = APIRouter(prefix="/api/costs", tags=["costs"])
 
 @router.get("/summary")
 def costs_summary() -> dict:
-    context = get_costs_context()
-    return {"summary_cards": context["summary_cards"], "total_cost": context["total_cost"]}
+    return get_costs_context()
 
 
 @router.get("/by-agent")

@@ -33,6 +33,11 @@ a {
   text-decoration: none;
 }
 
+button,
+input {
+  font: inherit;
+}
+
 .shell {
   min-height: 100vh;
   display: grid;
@@ -161,6 +166,12 @@ a {
   font-size: 0.92rem;
 }
 
+.support-health {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.82rem;
+}
+
 .content {
   padding: 26px 28px 30px;
 }
@@ -209,7 +220,6 @@ a {
   outline: none;
   background: transparent;
   color: var(--text);
-  font: inherit;
 }
 
 .search-icon {
@@ -782,6 +792,10 @@ a {
   height: 8px;
   border-radius: 999px;
   background: var(--highlight);
+}
+
+.error-card {
+  color: var(--danger);
 }
 
 @media (max-width: 1200px) {

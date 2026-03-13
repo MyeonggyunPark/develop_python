@@ -4,6 +4,10 @@
 - 여러 자동화 에이전트를 한 웹에서 등록, 실행, 모니터링, 운영하기 위한 상위 플랫폼 설계를 정의한다.
 - `agents/webtoon/docs/project-plan.md`는 웹툰 자동화 에이전트 단일 설계 문서로 유지하고, 이 문서는 공통 웹 플랫폼 설계를 다룬다.
 
+## 현재 구현 메모
+- 현재 구현은 `FastAPI API 서버 + React 프론트엔드` 구조를 기준으로 진행한다.
+- 과거 서버사이드 템플릿 예시는 더 이상 구현 기준이 아니며, 화면 라우팅은 `platform/frontend`에서 담당한다.
+
 ## 목표
 - 하나의 웹에서 여러 자동화 에이전트를 메뉴 단위로 관리한다.
 - 대시보드에서 전체 에이전트 상태, 최근 실행 이력, API 사용량, 비용을 한눈에 확인할 수 있다.
@@ -25,16 +29,15 @@
 ## 권장 기술 방향
 ### 웹 스택
 - 백엔드: `FastAPI`
-- 프론트엔드: `Jinja2 템플릿 + HTMX + Alpine.js` 또는 유사한 경량 서버 렌더링 방식
-- 스타일링: `Tailwind CSS`
+- 프론트엔드: `React + TypeScript + Vite`
+- 스타일링: React 컴포넌트 기반 CSS 또는 추후 도입할 UI 시스템
 - 데이터 저장: `SQLite`로 시작하고 이후 `PostgreSQL`로 확장 가능하게 설계
 - 스케줄 실행 연동: 기존 Python 에이전트 실행기와 직접 연결
 
 ### 기술 선택 이유
-- 현재 저장소가 Python 중심이므로 1차 버전은 Python 단일 스택이 가장 빠르다.
-- 별도 프론트엔드 빌드 체인을 강제하지 않아도 운영 UI를 빠르게 만들 수 있다.
-- Dashboard, 실행 이력, 비용 표, 상세 페이지는 서버 렌더링으로도 충분히 구현 가능하다.
-- 이후 필요하면 프론트엔드를 별도 SPA로 분리할 수 있도록 API 계층은 먼저 분리한다.
+- 백엔드는 Python 중심으로 유지하면서 프론트엔드는 독립적으로 확장할 수 있다.
+- Dashboard, 실행 이력, 승인 플로우, 비용 차트는 SPA 구조가 상호작용 확장에 유리하다.
+- API 계층을 먼저 분리해두면 프론트 배포와 백엔드 배포를 독립적으로 운영할 수 있다.
 
 ## 정보 구조 및 화면 설계
 ### 전역 메뉴 구조
@@ -96,28 +99,21 @@
 - `/settings`
   - 공통 설정 페이지
 
-### URL별 페이지 라우트 구조
-- `GET /`
+### 프론트엔드 페이지 라우트 구조
+- `/`
   - Dashboard 페이지
-  - 템플릿: `templates/dashboard.html`
-- `GET /agents`
+- `/agents`
   - 전체 에이전트 목록 페이지
-  - 템플릿: `templates/agents/list.html`
-- `GET /agents/{agent_slug}`
+- `/agents/{agent_slug}`
   - 에이전트 상세 Overview 페이지
-  - 템플릿: `templates/agents/detail.html`
-- `GET /agents/{agent_slug}/runs`
+- `/agents/{agent_slug}/runs`
   - 에이전트 실행 이력 목록 페이지
-  - 템플릿: `templates/agents/runs.html`
-- `GET /runs/{run_id}`
+- `/runs/{run_id}`
   - 실행 상세 페이지
-  - 템플릿: `templates/runs/detail.html`
-- `GET /costs`
+- `/costs`
   - 비용 및 사용량 페이지
-  - 템플릿: `templates/costs/index.html`
-- `GET /settings`
+- `/settings`
   - 플랫폼 설정 페이지
-  - 템플릿: `templates/settings/index.html`
 
 ### URL별 API 라우트 구조
 - `GET /api/dashboard/summary`
@@ -335,45 +331,26 @@
 ### 핵심 모듈
 - `platform/app/main.py`
   - FastAPI 엔트리포인트
-- `platform/app/routes/`
-  - 페이지 라우트
 - `platform/app/api/`
   - JSON API 라우트
 - `platform/app/services/`
   - 에이전트 실행, 비용 집계, 대시보드 집계 로직
 - `platform/app/repositories/`
   - DB 접근 계층
-- `platform/app/templates/`
-  - HTML 템플릿
-- `platform/app/static/`
-  - CSS, JS, 이미지
-
-### 템플릿 파일 구조
-```text
-platform/app/templates/
-  base.html
-  dashboard.html
-  agents/
-    list.html
-    detail.html
-    runs.html
-  runs/
-    detail.html
-  costs/
-    index.html
-  settings/
-    index.html
-```
+- `platform/frontend/`
+  - React 프론트엔드 애플리케이션
 
 ### 라우트 파일 구조
 ```text
-platform/app/routes/
-  pages.py
 platform/app/api/
   dashboard.py
   agents.py
   runs.py
   costs.py
+platform/frontend/src/
+  App.tsx
+  lib/api.ts
+  styles.css
 ```
 
 ### 공통 서비스 역할
@@ -681,12 +658,13 @@ ai_agent/
   platform/
     app/
       main.py
-      routes/
       api/
       services/
       repositories/
-      templates/
-      static/
+    frontend/
+      src/
+      package.json
+      vite.config.ts
     docs/
       agent-web-platform-plan.md
   agents/
@@ -699,7 +677,7 @@ ai_agent/
 
 ## 단계별 구현 계획
 1. `platform/app` 기본 구조와 FastAPI 엔트리포인트 생성
-2. Dashboard, Agents 목록, Agent 상세 페이지의 서버 렌더링 화면 구현
+2. React 기반 Dashboard, Agents 목록, Agent 상세 페이지 구현
 3. `Agent`, `AgentRun`, `AgentCost`, `AgentArtifact`, `PlatformSetting` 저장 구조 구현
 4. 웹툰 자동화 에이전트를 첫 번째 등록 에이전트로 연결
 5. 비용 집계와 최근 실행 대시보드 구현

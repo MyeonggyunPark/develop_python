@@ -113,7 +113,7 @@ RUN_ARTIFACTS = {
         {
             "artifact_type": "image",
             "artifact_name": "webtoon_final_v2.png",
-            "file_url": "/static/placeholder-image.txt",
+            "file_url": "#",
             "version": 2,
         },
         {

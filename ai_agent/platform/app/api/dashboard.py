@@ -7,7 +7,7 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 @router.get("/summary")
 def dashboard_summary() -> dict:
-    return {"summary_cards": get_dashboard_context()["summary_cards"]}
+    return get_dashboard_context()
 
 
 @router.get("/costs")
