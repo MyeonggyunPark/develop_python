@@ -1,0 +1,847 @@
+/* =========================================================
+   WORKSPACE MODULE
+   - Workspace card, lobby, stageboard
+   - Team grid / desk seats / avatars
+   - Phase strip
+   - Chat pane / message bubbles
+   - Topic form, directive card
+   - Script panels, recommendations
+   - Error / empty states
+   - Keyframes
+   ========================================================= */
+
+.workspace-card {
+  margin-bottom: 18px;
+}
+
+.workspace-head {
+  align-items: flex-start;
+}
+
+/* --- Lobby ---------------------------------------------------------------- */
+
+.workspace-lobby {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  padding: 42px 24px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 212, 59, 0.14), transparent 24%),
+    linear-gradient(145deg, var(--accent-soft) 0%, var(--surface) 100%);
+  text-align: center;
+}
+
+.workspace-lobby-copy {
+  max-width: 620px;
+}
+
+.workspace-lobby-copy h3 {
+  margin: 8px 0 12px;
+  font-size: 1.48rem;
+}
+
+.workspace-lobby-copy p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.workspace-join-button {
+  min-width: 220px;
+  padding: 14px 22px;
+  border-radius: var(--radius-full);
+  border: 0;
+  background: linear-gradient(145deg, var(--accent), var(--accent-strong));
+  color: #ffffff;
+  font-size: var(--text-base);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 18px 32px rgba(55, 118, 171, 0.24);
+}
+
+.workspace-join-button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.workspace-join-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.workspace-empty {
+  display: grid;
+  gap: 14px;
+}
+
+/* --- Room layout ---------------------------------------------------------- */
+
+.workspace-room-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.workspace-room-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+  gap: 18px;
+}
+
+.workspace-meeting-pane,
+.workspace-chat-pane {
+  min-width: 0;
+}
+
+.workspace-meeting-pane {
+  display: grid;
+  gap: 16px;
+}
+
+/* --- Cards ---------------------------------------------------------------- */
+
+.workspace-brief-card,
+.workspace-stageboard,
+.workspace-thread-card,
+.workspace-script-review,
+.workspace-desk-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface-soft);
+}
+
+.workspace-brief-card {
+  padding: 14px 16px;
+  background: var(--surface-soft);
+}
+
+/* --- Brief toggle --------------------------------------------------------- */
+
+.workspace-brief-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.workspace-brief-toggle:focus-visible {
+  outline: none;
+  border-radius: 8px;
+  box-shadow: var(--focus-ring);
+}
+
+.workspace-brief-summary {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.workspace-brief-chip {
+  display: inline-grid;
+  gap: 4px;
+  min-width: 132px;
+  padding: 11px 13px;
+  border-radius: 16px;
+  border: 1px solid rgba(18, 52, 90, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.workspace-brief-chip strong,
+.workspace-brief-item span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.workspace-brief-chip em {
+  font-style: normal;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.workspace-brief-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(18, 52, 90, 0.08);
+  color: var(--accent-strong);
+  font-size: 1.2rem;
+  transition: transform 180ms ease;
+}
+
+.workspace-brief-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.workspace-brief-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(18, 52, 90, 0.08);
+}
+
+.workspace-brief-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workspace-brief-item {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(18, 52, 90, 0.08);
+}
+
+.workspace-brief-item strong {
+  line-height: 1.55;
+}
+
+/* --- Stageboard ----------------------------------------------------------- */
+
+.workspace-stageboard {
+  background:
+    radial-gradient(circle at top right, rgba(80, 174, 255, 0.16), transparent 22%),
+    radial-gradient(circle at top left, rgba(255, 212, 59, 0.12), transparent 20%),
+    linear-gradient(145deg, #5a5d63 0%, #4b4e55 100%);
+  color: #ffffff;
+  min-height: 720px;
+}
+
+.workspace-meeting-stage {
+  display: grid;
+  gap: 18px;
+}
+
+.workspace-stageboard-head,
+.workspace-inline-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.workspace-stageboard-head h3 {
+  margin: 8px 0 0;
+}
+
+.workspace-stage-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workspace-stageboard .section-kicker {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.workspace-stageboard .pill {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* --- Team grid & desk seats ----------------------------------------------- */
+
+.workspace-team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+.workspace-room-footer {
+  display: grid;
+  gap: 14px;
+}
+
+.workspace-room-panel {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface-soft);
+}
+
+.workspace-desk-seat {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 26px;
+  border: 1px solid rgba(23, 34, 46, 0.08);
+  background: var(--surface-soft);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(18px) scale(0.98);
+  animation: workspaceTileEnter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--tile-delay, 0ms);
+}
+
+.workspace-desk-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.workspace-desk-seat.is-active {
+  box-shadow:
+    0 18px 34px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--avatar-accent) 42%, white);
+}
+
+.workspace-desk-seat.is-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  border: 1px solid color-mix(in srgb, var(--avatar-accent) 38%, white);
+  animation: workspaceActivePulse 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.workspace-person-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 8px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(18, 41, 61, 0.1);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.workspace-person-status {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+}
+
+.workspace-connection-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  border: 1px solid rgba(23, 34, 46, 0.08);
+}
+
+.workspace-connection-pill i {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.workspace-connection-pill.is-connected i {
+  background: var(--success);
+  box-shadow: 0 0 10px rgba(73, 209, 122, 0.8);
+}
+
+.workspace-connection-pill.is-connecting i {
+  background: #ffd43b;
+  box-shadow: 0 0 10px rgba(255, 212, 59, 0.7);
+}
+
+.workspace-connection-pill.is-offline i {
+  background: var(--line);
+}
+
+/* --- Avatars -------------------------------------------------------------- */
+
+.workspace-person-avatar,
+.workspace-message-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.workspace-desk-chair {
+  display: grid;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.workspace-person-avatar-ring,
+.workspace-message-avatar-ring {
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 1px rgba(18, 41, 61, 0.04);
+}
+
+.workspace-person-avatar-ring {
+  width: 116px;
+  height: 116px;
+}
+
+.workspace-message-avatar-ring {
+  width: 58px;
+  height: 58px;
+}
+
+.workspace-person-avatar-image,
+.workspace-message-avatar-image {
+  display: block;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.workspace-person-avatar-image {
+  width: 94px;
+  height: 94px;
+}
+
+.workspace-message-avatar-image {
+  width: 44px;
+  height: 44px;
+}
+
+.workspace-person-copy h3 {
+  margin: 0;
+  font-size: 1.04rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.workspace-person-title {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.workspace-person-copy p,
+.workspace-phase-card p,
+.workspace-message-bubble p {
+  margin: 0;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+/* --- Phase strip ---------------------------------------------------------- */
+
+.workspace-phase-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.workspace-phase-card {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.workspace-phase-card.is-done {
+  border-color: rgba(45, 122, 88, 0.28);
+  background: rgba(45, 122, 88, 0.08);
+}
+
+.workspace-phase-card.is-done::before,
+.workspace-phase-card.is-active::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 0;
+  height: 3px;
+  border-radius: var(--radius-full);
+}
+
+.workspace-phase-card.is-done::before {
+  background: var(--success);
+}
+
+.workspace-phase-card.is-active {
+  border-color: rgba(55, 118, 171, 0.36);
+  background: rgba(55, 118, 171, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(55, 118, 171, 0.12);
+  overflow: hidden;
+}
+
+.workspace-phase-card.is-active::before {
+  background: linear-gradient(90deg, transparent, rgba(55, 118, 171, 0.88), transparent);
+  animation: workspacePhaseSweep 2s linear infinite;
+}
+
+.workspace-phase-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.workspace-phase-top span,
+.workspace-inline-head span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.workspace-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workspace-block {
+  margin-top: 16px;
+}
+
+/* --- Topic form ----------------------------------------------------------- */
+
+.topic-form {
+  display: grid;
+  gap: 12px;
+}
+
+.topic-input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.topic-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.topic-input:disabled {
+  background: var(--surface-soft);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.topic-textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+/* --- Chat pane ------------------------------------------------------------ */
+
+.workspace-conversation-list {
+  display: grid;
+  gap: 14px;
+}
+
+.workspace-thread-card,
+.workspace-desk-card {
+  border-color: var(--line);
+}
+
+.workspace-thread-card {
+  background: var(--surface-soft);
+}
+
+.workspace-chat-pane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  min-height: 100%;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface-soft);
+}
+
+.workspace-chat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.workspace-chat-head h3 {
+  margin: 8px 0 0;
+}
+
+.workspace-chat-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.workspace-chat-stream {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 6px 2px 4px;
+  overflow: auto;
+}
+
+.workspace-chat-composer {
+  display: grid;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.workspace-chat-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* --- Directive card ------------------------------------------------------- */
+
+.workspace-directive-card {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(18, 52, 90, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(255, 212, 59, 0.24), transparent 28%),
+    linear-gradient(145deg, #12345a, #214b77);
+  color: #ffffff;
+  box-shadow: 0 16px 34px rgba(18, 52, 90, 0.18);
+}
+
+.workspace-directive-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
+}
+
+.workspace-directive-card strong {
+  font-size: 1.05rem;
+}
+
+.workspace-directive-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.6;
+}
+
+/* --- Message bubbles ------------------------------------------------------ */
+
+.workspace-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: workspaceMessageEnter 460ms ease forwards;
+  animation-delay: var(--message-delay, 0ms);
+}
+
+.workspace-message-bubble {
+  width: min(100%, 100%);
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.workspace-message-bubble.tone-staff {
+  background: var(--surface);
+}
+
+.workspace-message-bubble.tone-system {
+  background: linear-gradient(145deg, var(--accent-soft), var(--surface));
+}
+
+.workspace-message-bubble.tone-success {
+  border-color: rgba(45, 122, 88, 0.22);
+  background: linear-gradient(145deg, #eef8f2, var(--surface));
+}
+
+.workspace-message-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.84rem;
+}
+
+.workspace-message-head span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.workspace-message.tone-ops .workspace-message-bubble {
+  border-color: color-mix(in srgb, var(--avatar-accent) 24%, white);
+}
+
+.workspace-message.tone-topic .workspace-message-bubble {
+  border-color: rgba(216, 161, 6, 0.24);
+}
+
+.workspace-message.tone-writer .workspace-message-bubble {
+  border-color: rgba(45, 122, 88, 0.24);
+}
+
+.workspace-message.tone-qa .workspace-message-bubble {
+  border-color: rgba(139, 99, 199, 0.24);
+}
+
+/* --- Recommendations ------------------------------------------------------ */
+
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.recommendation-card {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.recommendation-card:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.recommendation-card strong {
+  line-height: 1.5;
+}
+
+/* --- Script panels -------------------------------------------------------- */
+
+.workspace-script-card,
+.script-panel-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.workspace-script-card p {
+  margin-bottom: 0;
+}
+
+.script-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.script-panel-card h3,
+.workspace-side h3 {
+  margin: 8px 0 10px;
+}
+
+.script-panel-card p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.script-dialogue {
+  margin-top: 12px;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+/* --- Error state ---------------------------------------------------------- */
+
+.workspace-error {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(203, 88, 60, 0.08);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* --- Keyframes ------------------------------------------------------------ */
+
+@keyframes workspaceTileEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes workspaceMessageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes workspaceActivePulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.01);
+  }
+}
+
+@keyframes workspacePhaseSweep {
+  0% {
+    transform: translateX(-65%);
+  }
+  100% {
+    transform: translateX(65%);
+  }
+}

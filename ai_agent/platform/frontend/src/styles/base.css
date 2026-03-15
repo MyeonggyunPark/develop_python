@@ -1,0 +1,41 @@
+/* =========================================================
+   BASE RESET & GLOBAL DEFAULTS
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans KR", "Segoe UI", sans-serif;
+  transition: background 250ms ease, color 250ms ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* Skeleton loading animation */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: var(--line);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}

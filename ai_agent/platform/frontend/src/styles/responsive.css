@@ -1,0 +1,144 @@
+/* =========================================================
+   RESPONSIVE
+   - 1200px: large → medium
+   - 900px: tablet (sidebar collapses to horizontal)
+   - 640px: small mobile
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .dashboard-grid,
+  .detail-hero,
+  .workspace-room-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .agent-detail-header,
+  .agent-detail-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .agent-detail-metrics,
+  .workspace-brief-grid,
+  .workspace-team-grid,
+  .workspace-phase-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .agent-card-grid {
+    grid-template-columns: repeat(2, minmax(280px, 320px));
+  }
+
+  .workspace-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .sidebar-top {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sidebar-footer {
+    flex-shrink: 0;
+    margin-top: 0;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .page-header,
+  .section-intro,
+  .hero-card {
+    flex-direction: column;
+  }
+
+  .search-box {
+    min-width: 100%;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .run-detail-drawer {
+    width: 100%;
+  }
+
+  .run-detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .agent-detail-metrics,
+  .workspace-brief-grid,
+  .workspace-team-grid,
+  .workspace-phase-strip,
+  .workspace-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-stageboard-head,
+  .workspace-inline-head,
+  .workspace-chat-head {
+    flex-direction: column;
+  }
+
+  .workspace-chat-meta {
+    justify-content: flex-start;
+  }
+
+  .agent-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 640px 이하: 소형 모바일 */
+@media (max-width: 640px) {
+  .content {
+    padding: 14px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .two-column,
+  .three-column {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-card-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .page-title-block h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .search-box {
+    min-width: 0;
+    width: 100%;
+  }
+}

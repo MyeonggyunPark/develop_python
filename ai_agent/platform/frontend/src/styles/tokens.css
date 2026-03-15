@@ -1,0 +1,183 @@
+/* =========================================================
+   DESIGN TOKENS
+   - Color system (light + dark)
+   - Typography scale
+   - Spacing scale
+   - Border radius scale
+   - Focus ring
+   - Reduced motion
+   ========================================================= */
+
+:root {
+  /* Colors */
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-soft: #f8fbff;
+  --sidebar-bg: #12345a;
+  --sidebar-bg-strong: #0d2743;
+  --text: #18293d;
+  --muted: #73859a;
+  --line: #d9e4ef;
+  --accent: #3776ab;
+  --accent-strong: #2b5d8a;
+  --accent-soft: #e8f1fa;
+  --highlight: #ffd43b;
+  --highlight-soft: #fff6d1;
+  --danger: #cb583c;
+  --success: #2d7a58;
+  --shadow: 0 18px 38px rgba(22, 52, 90, 0.08);
+
+  /* Status badge tokens */
+  --status-default-bg: #eef3f8;
+  --status-default-border: #d7e1ec;
+  --status-default-text: #5f7288;
+
+  --status-success-bg: #e7f8ee;
+  --status-success-border: #b9e6cf;
+  --status-success-text: #1f7a4d;
+
+  --status-review-bg: #eaf0ff;
+  --status-review-border: #cfdaf8;
+  --status-review-text: #4168c9;
+
+  --status-failed-bg: #fdecea;
+  --status-failed-border: #f3c2b8;
+  --status-failed-text: #bf5239;
+
+  --status-disabled-bg: #f2f4f7;
+  --status-disabled-border: #d8dde5;
+  --status-disabled-text: #6d7682;
+
+  --status-waiting-bg: #fff7df;
+  --status-waiting-border: #f1dfb1;
+  --status-waiting-text: #9c7323;
+
+  /* Typography scale */
+  --text-xs: 0.72rem;
+  --text-sm: 0.82rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.1rem;
+
+  /* Spacing scale (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Border radius scale */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 3px rgba(55, 118, 171, 0.45);
+  --focus-ring-sidebar: 0 0 0 3px rgba(255, 212, 59, 0.7);
+}
+
+/* Dark mode — system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111827;
+    --surface: #1f2937;
+    --surface-soft: #1a2332;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --line: #2d3f56;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: #1e3a5f;
+    --highlight: #fbbf24;
+    --highlight-soft: #3d2e00;
+    --danger: #f87171;
+    --success: #4ade80;
+    --shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+
+    --status-default-bg: rgba(55, 118, 171, 0.12);
+    --status-default-border: rgba(55, 118, 171, 0.3);
+    --status-default-text: #94a3b8;
+
+    --status-success-bg: rgba(74, 222, 128, 0.1);
+    --status-success-border: rgba(74, 222, 128, 0.28);
+    --status-success-text: #4ade80;
+
+    --status-review-bg: rgba(96, 165, 250, 0.1);
+    --status-review-border: rgba(96, 165, 250, 0.28);
+    --status-review-text: #60a5fa;
+
+    --status-failed-bg: rgba(248, 113, 113, 0.1);
+    --status-failed-border: rgba(248, 113, 113, 0.28);
+    --status-failed-text: #f87171;
+
+    --status-disabled-bg: rgba(100, 116, 139, 0.12);
+    --status-disabled-border: rgba(100, 116, 139, 0.28);
+    --status-disabled-text: #94a3b8;
+
+    --status-waiting-bg: rgba(251, 191, 36, 0.1);
+    --status-waiting-border: rgba(251, 191, 36, 0.28);
+    --status-waiting-text: #fbbf24;
+  }
+}
+
+/* Dark mode — explicit toggle */
+[data-theme="dark"] {
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface-soft: #1a2332;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --line: #2d3f56;
+  --accent: #60a5fa;
+  --accent-strong: #93c5fd;
+  --accent-soft: #1e3a5f;
+  --highlight: #fbbf24;
+  --highlight-soft: #3d2e00;
+  --danger: #f87171;
+  --success: #4ade80;
+  --shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+
+  --status-default-bg: rgba(55, 118, 171, 0.12);
+  --status-default-border: rgba(55, 118, 171, 0.3);
+  --status-default-text: #94a3b8;
+
+  --status-success-bg: rgba(74, 222, 128, 0.1);
+  --status-success-border: rgba(74, 222, 128, 0.28);
+  --status-success-text: #4ade80;
+
+  --status-review-bg: rgba(96, 165, 250, 0.1);
+  --status-review-border: rgba(96, 165, 250, 0.28);
+  --status-review-text: #60a5fa;
+
+  --status-failed-bg: rgba(248, 113, 113, 0.1);
+  --status-failed-border: rgba(248, 113, 113, 0.28);
+  --status-failed-text: #f87171;
+
+  --status-disabled-bg: rgba(100, 116, 139, 0.12);
+  --status-disabled-border: rgba(100, 116, 139, 0.28);
+  --status-disabled-text: #94a3b8;
+
+  --status-waiting-bg: rgba(251, 191, 36, 0.1);
+  --status-waiting-border: rgba(251, 191, 36, 0.28);
+  --status-waiting-text: #fbbf24;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
