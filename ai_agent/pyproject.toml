@@ -6,9 +6,21 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.116.1",
+    "google-api-python-client>=2.0.0",
+    "google-auth>=2.0.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.0",
+    "google-genai>=1.0.0",
+    "httpx>=0.28.1",
     "langchain>=1.2.10",
     "langchain-openai>=1.1.11",
     "openai>=2.26.0",
+    "pillow>=11.0.0",
     "python-dotenv>=1.2.2",
     "uvicorn>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
 ]

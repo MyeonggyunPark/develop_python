@@ -13,11 +13,11 @@ media/
 *.pot
 *.pyc
 
-# Environment variables
+# Environment
 .env
 *.env
 
-# Virtual environments
+# Virtual Environment
 .venv/
 .env/
 .virtualenv/
@@ -26,7 +26,7 @@ media/
 .DS_Store
 Thumbs.db
 
-# IDE
+# Editor / IDE
 .vscode/
 .idea/
 
@@ -36,6 +36,10 @@ dist/
 *.tsbuildinfo
 *.egg-info/
 
-# Node modules
+# Node
 node_modules/
+
+# Project
 platform/app/data/*.json
+agents/webtoon/secrets/
+agents/webtoon/docs/secrets/

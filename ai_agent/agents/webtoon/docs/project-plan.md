@@ -612,14 +612,15 @@
 - 모든 외부 서비스 자격 증명은 코드에 하드코딩하지 않는다.
 - 비밀값은 기존 `.env` 파일에서 관리하고, 운영 환경에서는 동일한 키 이름으로 주입한다.
 - 서비스별 인증 방식은 아래와 같이 고정한다.
-  - Google Drive API: 서비스 계정 사용
-  - Google Sheets API: 서비스 계정 사용
+  - Google Drive API: OAuth 2.0 사용자 인증 사용
+  - Google Sheets API: OAuth 2.0 사용자 인증 사용
   - 이미지 생성 API: API Key 사용
   - OCR 또는 Vision API: API Key 또는 서비스 계정 사용
   - Instagram Graph API: 장기 토큰 사용
 
 #### 필수 환경변수
-- `GOOGLE_SERVICE_ACCOUNT_FILE`
+- `GOOGLE_OAUTH_CLIENT_SECRET_FILE`
+- `GOOGLE_OAUTH_TOKEN_FILE`
 - `GOOGLE_DRIVE_ROOT_FOLDER_ID`
 - `GOOGLE_SHEETS_SPREADSHEET_ID`
 - `IMAGE_API_KEY`
@@ -635,12 +636,12 @@
 - 현재 단계에서는 문서에 정의된 기본값과 `.env` 환경변수만으로 운영한다.
 
 #### 권한 및 리소스 관리 원칙
-- Google Drive 루트 폴더와 Google Sheets 문서는 서비스 계정에 명시적으로 공유한다.
+- Google Drive 루트 폴더와 Google Sheets 문서는 OAuth 인증에 사용하는 본인 계정이 접근 가능해야 한다.
 - 운영에 사용하는 폴더 ID, 시트 ID, 인스타 계정 ID는 환경변수로 주입한다.
 - 권한 부족 또는 인증 실패 시 즉시 `failed` 상태로 전이하고 `error_stage`와 `error_message`를 기록한다.
 
 #### 운영 체크포인트
-- 구현 시작 전에 서비스 계정 생성 및 권한 공유를 완료한다.
+- 구현 시작 전에 Google OAuth 클라이언트 생성과 사용자 인증을 완료한다.
 - Instagram 비즈니스 계정 연결 여부를 사전 점검한다.
 - 각 API별 테스트 호출로 인증 성공 여부를 먼저 확인한다.
 

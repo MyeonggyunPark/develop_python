@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
+import re
 from threading import RLock
 
 
@@ -13,10 +14,26 @@ STORE_LOCK = RLock()
 RECOMMENDATION_POOL = [
     "독일 마트 셀프 계산대에서 생긴 해프닝",
     "겨울 아침 환기 타이밍 때문에 생긴 소동",
-    "분리수거 규칙 때문에 벌어진 고양이 토론",
-    "기차 지연 앱을 보는 두 고양이의 반응 차이",
+    "분리수거 규칙 때문에 벌어진 현실 토론",
+    "기차 지연 앱을 보는 둘의 반응 차이",
     "독일 빵집에서 메뉴를 고르는 작은 문화 충격",
 ]
+
+
+def _sanitize_public_text(text: str) -> str:
+    cleaned = text.strip()
+    replacements = (
+        ("고양이 웹툰", "생활툰"),
+        ("고양이웹툰", "생활툰"),
+        ("고양이툰", "생활툰"),
+        ("두 고양이", "둘"),
+        ("고양이들", "둘"),
+        ("고양이", ""),
+    )
+    for before, after in replacements:
+        cleaned = cleaned.replace(before, after)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+    return cleaned.strip(" ,")
 
 
 def _utcnow() -> str:
@@ -55,27 +72,40 @@ def _build_run_key() -> tuple[str, str]:
 
 
 def _build_script(topic: str, version: int) -> dict:
+    public_topic = _sanitize_public_text(topic) or topic
     panels = [
         {
             "panel_no": 1,
             "title": "상황 시작",
-            "dialogue": f"오늘 주제는 '{topic}' 이야.",
-            "summary": "두 고양이가 오늘의 독일생활 상황을 마주한다.",
+            "dialogue": f"오늘 주제는 '{public_topic}' 이야.",
+            "summary": "두 인물이 오늘의 독일생활 상황을 마주한다.",
         },
         {
             "panel_no": 2,
-            "title": "문화 차이",
+            "title": "첫 시도",
             "dialogue": "생각보다 규칙이 까다롭네?",
             "summary": "현지 생활 규칙이나 문화 차이로 작은 갈등이 생긴다.",
         },
         {
             "panel_no": 3,
-            "title": "공감 포인트",
-            "dialogue": "그래도 익숙해지면 웃기긴 해.",
-            "summary": "낯설지만 공감되는 포인트가 드러난다.",
+            "title": "문제 발생",
+            "dialogue": "어? 여기서 막힌다고?",
+            "summary": "예상 못 한 변수가 등장하면서 분위기가 급격히 흔들린다.",
         },
         {
             "panel_no": 4,
+            "title": "고군분투",
+            "dialogue": "잠깐만, 다시 순서 맞춰 보자.",
+            "summary": "당황하지만 해결 단서를 찾기 위해 다시 상황을 살핀다.",
+        },
+        {
+            "panel_no": 5,
+            "title": "해결",
+            "dialogue": "이제 왜 안 됐는지 알겠다!",
+            "summary": "문제 원인을 발견하고 흐름이 풀리기 시작한다.",
+        },
+        {
+            "panel_no": 6,
             "title": "마무리",
             "dialogue": "오늘도 독일생활 레벨 업 완료!",
             "summary": "따뜻한 결론과 함께 에피소드가 마무리된다.",
@@ -83,8 +113,8 @@ def _build_script(topic: str, version: int) -> dict:
     ]
     return {
         "version": version,
-        "title": f"{topic} 에피소드",
-        "caption": f"{topic}을 주제로 한 독일생활 고양이 네컷 웹툰 캡션 초안입니다.",
+        "title": f"{public_topic} 에피소드",
+        "caption": f"{public_topic}을 주제로 한 독일생활 6컷 웹툰 캡션 초안입니다.",
         "panels": panels,
     }
 

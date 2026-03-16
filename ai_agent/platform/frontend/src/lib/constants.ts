@@ -25,7 +25,7 @@ export const DASHBOARD_SUMMARY_ICONS: IconName[] = ["activeAgents", "recentRuns"
 export const WORKSPACE_PHASE_TEMPLATES = [
   { id: "brief", label: "브리프 접수", owner: "사장", detail: "이번 주 방향과 마감 공유" },
   { id: "topic", label: "주제 확정", owner: "편성", detail: "직접 입력 또는 추천 선택" },
-  { id: "script", label: "스크립트 작성", owner: "작가", detail: "4컷 흐름과 캡션 초안 작성" },
+  { id: "script", label: "스크립트 작성", owner: "작가", detail: "6컷 흐름과 캡션 초안 작성" },
   { id: "review", label: "교정 및 승인", owner: "에디터", detail: "재생성 여부 확인 후 승인" },
   { id: "output", label: "결과물 전달", owner: "운영", detail: "최종 산출물 정리 및 공유" },
 ] as const;

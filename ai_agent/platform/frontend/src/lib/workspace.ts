@@ -69,7 +69,7 @@ export function getWorkspaceParticipants(workspace: AgentWorkspace): WorkspacePa
       note: workspace.script
         ? `${workspace.script.panels.length}컷 구성을 정리했고 캡션 초안도 함께 올렸습니다.`
         : workspace.topic
-          ? "확정된 주제를 받아 4컷 흐름을 쓰고 있습니다."
+          ? "확정된 주제를 받아 6컷 흐름을 쓰고 있습니다."
           : "주제가 확정되면 바로 콘티 초안을 만들겠습니다.",
       badge: "WR",
       tone: "writer",
