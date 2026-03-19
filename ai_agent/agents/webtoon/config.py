@@ -9,11 +9,31 @@ from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ENV_PATH = REPO_ROOT / ".env"
-DEFAULT_LLM_MODEL = "gemini-2.5-flash"
-DEFAULT_OCR_MODEL = "gemini-2.5-flash"
+DEFAULT_GOOGLE_OAUTH_CLIENT_SECRET_FILE = REPO_ROOT / "agents" / "webtoon" / "secrets" / "google-oauth-client-secret.json"
+DEFAULT_GOOGLE_OAUTH_TOKEN_FILE = REPO_ROOT / "agents" / "webtoon" / "secrets" / "google-oauth-token.json"
+DEFAULT_LLM_MODEL = "gemini-3-flash-preview"
+DEFAULT_OCR_MODEL = "gemini-3-flash-preview"
+DEFAULT_OCR_EXTRACT_MODEL = DEFAULT_OCR_MODEL
 DEFAULT_IMAGE_MODEL = "gemini-2.5-flash-image"
+DEFAULT_LLM_THINKING_LEVEL = "high"
+DEFAULT_OCR_THINKING_LEVEL = "high"
+DEFAULT_OCR_EXTRACT_THINKING_LEVEL = "high"
 DEFAULT_INSTAGRAM_GRAPH_VERSION = "v23.0"
 DEFAULT_MAX_CORRECTION_ATTEMPTS = 2
+DEFAULT_API_PARALLELISM = 3
+DEFAULT_ENABLE_CONTEXT_CACHING = True
+DEFAULT_CONTEXT_CACHE_TTL = "3600s"
+WEBTOON_REQUIRED_FIELDS = frozenset(
+    {
+        "google_oauth_client_secret_file",
+        "google_drive_root_folder_id",
+        "google_sheets_spreadsheet_id",
+        "gemini_api_key",
+        "instagram_access_token",
+        "instagram_business_account_id",
+        "approval_default_user",
+    }
+)
 
 
 def _read_required_env(name: str) -> str:
@@ -23,62 +43,137 @@ def _read_required_env(name: str) -> str:
     return value
 
 
+def _read_env(name: str, default: str = "") -> str:
+    return os.getenv(name, "").strip() or default
+
+
+def _read_bool_env(name: str, default: bool = False) -> bool:
+    value = os.getenv(name, "").strip().lower()
+    if not value:
+        return default
+    return value in {"1", "true", "yes", "on"}
+
+
+def _read_env_alias(primary: str, *aliases: str, default: str = "") -> str:
+    for name in (primary, *aliases):
+        value = os.getenv(name, "").strip()
+        if value:
+            return value
+    return default
+
+
+def _read_required_env_alias(primary: str, *aliases: str) -> str:
+    value = _read_env_alias(primary, *aliases, default="")
+    if not value:
+        raise ValueError(f"Missing required environment variable: {primary}")
+    return value
+
+
+def _read_optional_path(name: str, default: Path) -> Path:
+    value = _read_env(name)
+    return Path(value).expanduser() if value else default
+
+
 @dataclass(frozen=True)
 class WebtoonSettings:
-    llm_provider_api_key: str
     google_oauth_client_secret_file: Path
     google_oauth_token_file: Path
     google_drive_root_folder_id: str
     google_sheets_spreadsheet_id: str
-    image_api_key: str
-    ocr_api_key: str
+    gemini_api_key: str
     instagram_access_token: str
     instagram_business_account_id: str
     approval_default_user: str
     llm_model: str = DEFAULT_LLM_MODEL
     ocr_model: str = DEFAULT_OCR_MODEL
+    ocr_extract_model: str = DEFAULT_OCR_EXTRACT_MODEL
     image_model: str = DEFAULT_IMAGE_MODEL
+    llm_thinking_level: str = DEFAULT_LLM_THINKING_LEVEL
+    ocr_thinking_level: str = DEFAULT_OCR_THINKING_LEVEL
+    ocr_extract_thinking_level: str = DEFAULT_OCR_EXTRACT_THINKING_LEVEL
     instagram_graph_api_version: str = DEFAULT_INSTAGRAM_GRAPH_VERSION
     character_assets_dir: Path = REPO_ROOT / "agents" / "webtoon" / "assets" / "characters"
     font_assets_dir: Path = REPO_ROOT / "agents" / "webtoon" / "assets" / "fonts"
     font_file: Path | None = None
     max_correction_attempts: int = DEFAULT_MAX_CORRECTION_ATTEMPTS
+    api_parallelism: int = DEFAULT_API_PARALLELISM
+    enable_context_caching: bool = DEFAULT_ENABLE_CONTEXT_CACHING
+    context_cache_ttl: str = DEFAULT_CONTEXT_CACHE_TTL
 
     @classmethod
-    def from_env(cls, env_path: Path | None = None) -> "WebtoonSettings":
+    def from_env(
+        cls,
+        env_path: Path | None = None,
+        *,
+        required_fields: set[str] | frozenset[str] | None = None,
+    ) -> "WebtoonSettings":
         load_dotenv(env_path or DEFAULT_ENV_PATH)
-        oauth_client_secret_file = Path(_read_required_env("GOOGLE_OAUTH_CLIENT_SECRET_FILE")).expanduser()
-        oauth_token_file_value = os.getenv("GOOGLE_OAUTH_TOKEN_FILE", "").strip()
-        oauth_token_file = (
-            Path(oauth_token_file_value).expanduser()
-            if oauth_token_file_value
-            else REPO_ROOT / "agents" / "webtoon" / "secrets" / "google-oauth-token.json"
+        required = WEBTOON_REQUIRED_FIELDS if required_fields is None else frozenset(required_fields)
+        oauth_client_secret_file = _read_optional_path(
+            "GOOGLE_OAUTH_CLIENT_SECRET_FILE",
+            DEFAULT_GOOGLE_OAUTH_CLIENT_SECRET_FILE,
         )
+        oauth_token_file = _read_optional_path("GOOGLE_OAUTH_TOKEN_FILE", DEFAULT_GOOGLE_OAUTH_TOKEN_FILE)
+        if "google_oauth_client_secret_file" in required and not _read_env("GOOGLE_OAUTH_CLIENT_SECRET_FILE"):
+            raise ValueError("Missing required environment variable: GOOGLE_OAUTH_CLIENT_SECRET_FILE")
         return cls(
-            llm_provider_api_key=(os.getenv("LLM_PROVIDER_API_KEY", "").strip() or _read_required_env("IMAGE_API_KEY")),
             google_oauth_client_secret_file=oauth_client_secret_file,
             google_oauth_token_file=oauth_token_file,
-            google_drive_root_folder_id=_read_required_env("GOOGLE_DRIVE_ROOT_FOLDER_ID"),
-            google_sheets_spreadsheet_id=_read_required_env("GOOGLE_SHEETS_SPREADSHEET_ID"),
-            image_api_key=_read_required_env("IMAGE_API_KEY"),
-            ocr_api_key=(os.getenv("OCR_API_KEY", "").strip() or _read_required_env("IMAGE_API_KEY")),
-            instagram_access_token=_read_required_env("INSTAGRAM_ACCESS_TOKEN"),
-            instagram_business_account_id=_read_required_env("INSTAGRAM_BUSINESS_ACCOUNT_ID"),
-            approval_default_user=_read_required_env("APPROVAL_DEFAULT_USER"),
-            llm_model=os.getenv("LLM_MODEL", DEFAULT_LLM_MODEL).strip() or DEFAULT_LLM_MODEL,
-            ocr_model=os.getenv("OCR_MODEL", DEFAULT_OCR_MODEL).strip() or DEFAULT_OCR_MODEL,
-            image_model=os.getenv("IMAGE_MODEL", DEFAULT_IMAGE_MODEL).strip() or DEFAULT_IMAGE_MODEL,
-            instagram_graph_api_version=(
-                os.getenv("INSTAGRAM_GRAPH_API_VERSION", DEFAULT_INSTAGRAM_GRAPH_VERSION).strip()
-                or DEFAULT_INSTAGRAM_GRAPH_VERSION
+            google_drive_root_folder_id=(
+                _read_required_env("GOOGLE_DRIVE_ROOT_FOLDER_ID")
+                if "google_drive_root_folder_id" in required
+                else _read_env("GOOGLE_DRIVE_ROOT_FOLDER_ID")
             ),
+            google_sheets_spreadsheet_id=(
+                _read_required_env("GOOGLE_SHEETS_SPREADSHEET_ID")
+                if "google_sheets_spreadsheet_id" in required
+                else _read_env("GOOGLE_SHEETS_SPREADSHEET_ID")
+            ),
+            gemini_api_key=(
+                _read_required_env_alias("GEMINI_API_KEY", "IMAGE_API_KEY")
+                if "gemini_api_key" in required
+                else _read_env_alias("GEMINI_API_KEY", "IMAGE_API_KEY")
+            ),
+            instagram_access_token=(
+                _read_required_env("INSTAGRAM_ACCESS_TOKEN")
+                if "instagram_access_token" in required
+                else _read_env("INSTAGRAM_ACCESS_TOKEN")
+            ),
+            instagram_business_account_id=(
+                _read_required_env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
+                if "instagram_business_account_id" in required
+                else _read_env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
+            ),
+            approval_default_user=(
+                _read_required_env("APPROVAL_DEFAULT_USER")
+                if "approval_default_user" in required
+                else _read_env("APPROVAL_DEFAULT_USER")
+            ),
+            llm_model=_read_env("LLM_MODEL", DEFAULT_LLM_MODEL) or DEFAULT_LLM_MODEL,
+            ocr_model=_read_env("OCR_MODEL", DEFAULT_OCR_MODEL) or DEFAULT_OCR_MODEL,
+            ocr_extract_model=_read_env("OCR_EXTRACT_MODEL", DEFAULT_OCR_EXTRACT_MODEL) or DEFAULT_OCR_EXTRACT_MODEL,
+            image_model=_read_env("IMAGE_MODEL", DEFAULT_IMAGE_MODEL) or DEFAULT_IMAGE_MODEL,
+            llm_thinking_level=_read_env("LLM_THINKING_LEVEL", DEFAULT_LLM_THINKING_LEVEL) or DEFAULT_LLM_THINKING_LEVEL,
+            ocr_thinking_level=_read_env("OCR_THINKING_LEVEL", DEFAULT_OCR_THINKING_LEVEL) or DEFAULT_OCR_THINKING_LEVEL,
+            ocr_extract_thinking_level=(
+                _read_env("OCR_EXTRACT_THINKING_LEVEL", DEFAULT_OCR_EXTRACT_THINKING_LEVEL)
+                or DEFAULT_OCR_EXTRACT_THINKING_LEVEL
+            ),
+            instagram_graph_api_version=_read_env("INSTAGRAM_GRAPH_API_VERSION", DEFAULT_INSTAGRAM_GRAPH_VERSION)
+            or DEFAULT_INSTAGRAM_GRAPH_VERSION,
             font_file=(
-                Path(os.getenv("WEBTOON_FONT_FILE", "")).expanduser()
-                if os.getenv("WEBTOON_FONT_FILE", "").strip()
+                Path(_read_env("WEBTOON_FONT_FILE")).expanduser()
+                if _read_env("WEBTOON_FONT_FILE")
                 else None
             ),
             max_correction_attempts=max(
                 0,
-                int(os.getenv("MAX_CORRECTION_ATTEMPTS", str(DEFAULT_MAX_CORRECTION_ATTEMPTS)).strip() or DEFAULT_MAX_CORRECTION_ATTEMPTS),
+                int(_read_env("MAX_CORRECTION_ATTEMPTS", str(DEFAULT_MAX_CORRECTION_ATTEMPTS)) or DEFAULT_MAX_CORRECTION_ATTEMPTS),
             ),
+            api_parallelism=max(
+                1,
+                int(_read_env("API_PARALLELISM", str(DEFAULT_API_PARALLELISM)) or DEFAULT_API_PARALLELISM),
+            ),
+            enable_context_caching=_read_bool_env("ENABLE_CONTEXT_CACHING", DEFAULT_ENABLE_CONTEXT_CACHING),
+            context_cache_ttl=_read_env("CONTEXT_CACHE_TTL", DEFAULT_CONTEXT_CACHE_TTL) or DEFAULT_CONTEXT_CACHE_TTL,
         )

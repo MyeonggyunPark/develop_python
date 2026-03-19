@@ -4,10 +4,12 @@ import argparse
 import json
 from pathlib import Path
 
-from .config import WebtoonSettings
+from .config import WEBTOON_REQUIRED_FIELDS, WebtoonSettings
 from .clients import GoogleWorkspaceClient
 from .pipeline import run_webtoon_pipeline
 from .smoke_tests import run_smoke_tests
+
+DEFAULT_SMOKE_SERVICES = ("llm", "ocr", "image", "drive", "sheets", "instagram")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,10 +42,48 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _required_settings_fields(args: argparse.Namespace) -> set[str]:
+    if args.command == "google-auth":
+        if args.status_only:
+            return set()
+        return {"google_oauth_client_secret_file"}
+
+    if args.command == "smoke":
+        selected = set(args.services or DEFAULT_SMOKE_SERVICES)
+        required: set[str] = set()
+        if {"llm", "ocr", "image"} & selected:
+            required.add("gemini_api_key")
+        if "drive" in selected:
+            required.add("google_drive_root_folder_id")
+        if "sheets" in selected:
+            required.add("google_sheets_spreadsheet_id")
+        if "instagram" in selected:
+            required.update(
+                {
+                    "instagram_access_token",
+                    "instagram_business_account_id",
+                }
+            )
+        return required
+
+    if args.command == "pipeline":
+        required = set(WEBTOON_REQUIRED_FIELDS)
+        required.discard("google_oauth_client_secret_file")
+        if not args.publish:
+            required.discard("instagram_access_token")
+            required.discard("instagram_business_account_id")
+        return required
+
+    return set()
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
-    settings = WebtoonSettings.from_env(args.env_file)
+    try:
+        settings = WebtoonSettings.from_env(args.env_file, required_fields=_required_settings_fields(args))
+    except ValueError as error:
+        parser.exit(2, f"설정 오류: {error}\n")
 
     if args.command == "smoke":
         result = run_smoke_tests(settings, services=args.services)

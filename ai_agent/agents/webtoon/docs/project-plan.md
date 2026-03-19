@@ -614,8 +614,7 @@
 - 서비스별 인증 방식은 아래와 같이 고정한다.
   - Google Drive API: OAuth 2.0 사용자 인증 사용
   - Google Sheets API: OAuth 2.0 사용자 인증 사용
-  - 이미지 생성 API: API Key 사용
-  - OCR 또는 Vision API: API Key 또는 서비스 계정 사용
+  - Gemini LLM / 이미지 생성 / OCR API: 공통 API Key 사용
   - Instagram Graph API: 장기 토큰 사용
 
 #### 필수 환경변수
@@ -623,8 +622,7 @@
 - `GOOGLE_OAUTH_TOKEN_FILE`
 - `GOOGLE_DRIVE_ROOT_FOLDER_ID`
 - `GOOGLE_SHEETS_SPREADSHEET_ID`
-- `IMAGE_API_KEY`
-- `OCR_API_KEY`
+- `GEMINI_API_KEY`
 - `INSTAGRAM_ACCESS_TOKEN`
 - `INSTAGRAM_BUSINESS_ACCOUNT_ID`
 - `APPROVAL_DEFAULT_USER`

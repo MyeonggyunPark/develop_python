@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from time import perf_counter
 from typing import Any
 
 from .clients import (
@@ -15,10 +16,20 @@ from .config import WebtoonSettings
 
 
 def _run_step(results: dict[str, Any], name: str, action) -> None:
+    started_at = perf_counter()
     try:
-        results["services"][name] = {"ok": True, "data": action()}
+        data = action()
+        results["services"][name] = {
+            "ok": True,
+            "duration_ms": round((perf_counter() - started_at) * 1000, 2),
+            "data": data,
+        }
     except Exception as error:  # noqa: BLE001
-        results["services"][name] = {"ok": False, "error": f"{type(error).__name__}: {error}"}
+        results["services"][name] = {
+            "ok": False,
+            "duration_ms": round((perf_counter() - started_at) * 1000, 2),
+            "error": f"{type(error).__name__}: {error}",
+        }
 
 
 def run_smoke_tests(settings: WebtoonSettings, services: list[str] | None = None) -> dict[str, Any]:
@@ -27,6 +38,7 @@ def run_smoke_tests(settings: WebtoonSettings, services: list[str] | None = None
         "timestamp": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "services": {},
     }
+    google_client: GoogleWorkspaceClient | None = None
 
     if "llm" in selected:
         _run_step(results, "llm", lambda: GeminiTextClient(settings).smoke_test())
@@ -38,11 +50,14 @@ def run_smoke_tests(settings: WebtoonSettings, services: list[str] | None = None
     if "image" in selected:
         _run_step(results, "image", lambda: GeminiImageClient(settings).smoke_test())
 
-    google_client = GoogleWorkspaceClient(settings)
     if "drive" in selected:
+        if google_client is None:
+            google_client = GoogleWorkspaceClient(settings)
         _run_step(results, "drive", lambda: google_client.smoke_test_drive())
 
     if "sheets" in selected:
+        if google_client is None:
+            google_client = GoogleWorkspaceClient(settings)
         _run_step(results, "sheets", lambda: google_client.smoke_test_sheets())
 
     if "instagram" in selected:

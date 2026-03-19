@@ -31,8 +31,14 @@ FOUR_PANEL_OUTER_MARGIN = 28
 FOUR_PANEL_GUTTER = 24
 THUMBNAIL_BADGE_TEXT = "독일생활 적응기"
 DEFAULT_BUBBLE_FONT_SIZE = 34
-MIN_BUBBLE_FONT_SIZE = 24
+MIN_BUBBLE_FONT_SIZE = 18
+ABSOLUTE_MIN_BUBBLE_FONT_SIZE = 16
 BUBBLE_LINE_GAP = 4
+MIN_BUBBLE_LINE_GAP = 0
+MIN_BUBBLE_PADDING_X = 12
+MIN_BUBBLE_PADDING_Y = 10
+TOP_BUBBLE_CLEARANCE_RATIO = 0.24
+BOTTOM_BUBBLE_CLEARANCE_RATIO = 0.24
 
 
 def resolve_font_path(settings: WebtoonSettings) -> Path | None:
@@ -77,6 +83,25 @@ def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont, 
     words = text.split()
     if not words:
         return [text]
+
+    normalized_words: list[str] = []
+    for word in words:
+        bbox = draw.textbbox((0, 0), word, font=font)
+        if bbox[2] - bbox[0] <= max_width:
+            normalized_words.append(word)
+            continue
+        chunk = ""
+        for char in word:
+            candidate = chunk + char
+            candidate_bbox = draw.textbbox((0, 0), candidate, font=font)
+            if chunk and candidate_bbox[2] - candidate_bbox[0] > max_width:
+                normalized_words.append(chunk)
+                chunk = char
+            else:
+                chunk = candidate
+        if chunk:
+            normalized_words.append(chunk)
+    words = normalized_words
 
     # Step 1: greedy wrap to determine the number of lines needed.
     lines: list[str] = []
@@ -130,7 +155,15 @@ def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont, 
 
 def _compute_text_lines(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont, max_width: int) -> list[str]:
     if " " in text:
-        return _wrap_text(draw, text, font, max_width)
+        lines = _wrap_text(draw, text, font, max_width)
+        normalized: list[str] = []
+        for line in lines:
+            bbox = draw.textbbox((0, 0), line, font=font)
+            if bbox[2] - bbox[0] <= max_width:
+                normalized.append(line)
+                continue
+            normalized.extend(_compute_text_lines(draw, line.replace(" ", ""), font, max_width))
+        return normalized
 
     lines: list[str] = []
     current = ""
@@ -230,6 +263,21 @@ def split_dialogue_groups(dialogue_lines: list[str]) -> list[list[str]]:
     return [lines[:2], lines[2:4]]
 
 
+def _speaker_groups_for_panel(panel: dict[str, Any]) -> list[list[str]]:
+    speaker_dialogues = panel.get("speaker_dialogues", [])
+    if isinstance(speaker_dialogues, list) and speaker_dialogues:
+        groups: list[list[str]] = []
+        for block in speaker_dialogues[:2]:
+            if not isinstance(block, dict):
+                continue
+            lines = [str(line).strip() for line in block.get("dialogue_lines", []) if str(line).strip()]
+            if lines:
+                groups.append(lines)
+        if groups:
+            return groups
+    return split_dialogue_groups(panel.get("dialogue_lines", []))
+
+
 def _scale_polygon(points: list[tuple[int, int]], scale: float) -> list[tuple[int, int]]:
     cx = sum(x for x, _ in points) / len(points)
     cy = sum(y for _, y in points) / len(points)
@@ -244,12 +292,13 @@ def _estimate_bubble_size(
 ) -> tuple[int, int]:
     panel_width = panel_box[2] - panel_box[0]
     panel_height = panel_box[3] - panel_box[1]
+    retry_step = max(0, render_version - 1)
     if num_groups <= 1:
-        width_ratio = min(0.60, 0.46 + 0.03 * (render_version - 1))
-        height_ratio = min(0.32, 0.22 + 0.02 * render_version)
+        width_ratio = max(0.38, 0.46 - 0.04 * retry_step)
+        height_ratio = max(0.16, 0.18 - 0.015 * retry_step)
     else:
-        width_ratio = min(0.42, 0.31 + 0.02 * render_version)
-        height_ratio = min(0.24, 0.16 + 0.02 * render_version)
+        width_ratio = max(0.24, 0.31 - 0.02 * retry_step)
+        height_ratio = max(0.13, 0.16 - 0.01 * retry_step)
     return int(panel_width * width_ratio), int(panel_height * height_ratio)
 
 
@@ -264,28 +313,46 @@ def _candidate_boxes(
     panel_height = panel_box[3] - panel_box[1]
     margin_x = max(18, int(panel_width * 0.04))
     margin_y = max(18, int(panel_height * 0.035))
-
+    inset_x = max(20, int(panel_width * 0.08))
     if side == "left":
-        x1 = panel_box[0] + margin_x
+        x_positions = [panel_box[0] + margin_x, panel_box[0] + margin_x + inset_x]
     elif side == "right":
-        x1 = panel_box[2] - margin_x - box_width
+        right_edge = panel_box[2] - margin_x - box_width
+        x_positions = [right_edge, right_edge - inset_x]
     else:
-        x1 = panel_box[0] + (panel_width - box_width) // 2
+        x_positions = [panel_box[0] + (panel_width - box_width) // 2]
 
+    min_x = panel_box[0] + margin_x
+    max_x = panel_box[2] - margin_x - box_width
     positions = [
+        ("ceiling", panel_box[1] + max(8, margin_y // 3)),
         ("top", panel_box[1] + margin_y),
-        ("middle", panel_box[1] + (panel_height - box_height) // 2),
+        ("upper_mid", panel_box[1] + int(panel_height * 0.22)),
+        ("lower_mid", panel_box[1] + int(panel_height * 0.58) - box_height),
         ("bottom", panel_box[3] - margin_y - box_height),
     ]
-    return [
-        {
-            "box": (x1, y1, x1 + box_width, y1 + box_height),
-            "v_pos": "bottom" if label == "bottom" else "top",
-            "label": label,
-            "side": side,
-        }
-        for label, y1 in positions
-    ]
+    panel_mid_y = panel_box[1] + panel_height // 2
+    seen: set[tuple[int, int, str]] = set()
+    candidates: list[dict[str, Any]] = []
+    for raw_x in x_positions:
+        x1 = max(min_x, min(max_x, raw_x))
+        max_y = panel_box[3] - margin_y - box_height
+        min_y = panel_box[1] + max(8, margin_y // 3)
+        for label, raw_y in positions:
+            y1 = max(min_y, min(max_y, raw_y))
+            key = (x1, y1, label)
+            if key in seen:
+                continue
+            seen.add(key)
+            candidates.append(
+                {
+                    "box": (x1, y1, x1 + box_width, y1 + box_height),
+                    "v_pos": "bottom" if (y1 + box_height // 2) >= panel_mid_y else "top",
+                    "label": label,
+                    "side": side,
+                }
+            )
+    return candidates
 
 
 def _visual_density_score(image: Image.Image, box: tuple[int, int, int, int]) -> float:
@@ -302,6 +369,33 @@ def _boxes_overlap(box_a: tuple[int, int, int, int], box_b: tuple[int, int, int,
     return not (box_a[2] <= box_b[0] or box_b[2] <= box_a[0] or box_a[3] <= box_b[1] or box_b[3] <= box_a[1])
 
 
+def _overlap_area(box_a: tuple[int, int, int, int], box_b: tuple[int, int, int, int]) -> int:
+    overlap_x = max(0, min(box_a[2], box_b[2]) - max(box_a[0], box_b[0]))
+    overlap_y = max(0, min(box_a[3], box_b[3]) - max(box_a[1], box_b[1]))
+    return overlap_x * overlap_y
+
+
+def _character_safe_boxes(panel_box: tuple[int, int, int, int], panel_index: int) -> list[tuple[int, int, int, int]]:
+    panel_width = panel_box[2] - panel_box[0]
+    panel_height = panel_box[3] - panel_box[1]
+    prefers_bottom_lane = panel_index % 2 == 0
+    top_clearance = int(panel_height * (0.10 if prefers_bottom_lane else TOP_BUBBLE_CLEARANCE_RATIO))
+    bottom_clearance = int(panel_height * (BOTTOM_BUBBLE_CLEARANCE_RATIO if prefers_bottom_lane else 0.10))
+    left_box = (
+        panel_box[0] + int(panel_width * 0.18),
+        panel_box[1] + top_clearance,
+        panel_box[0] + int(panel_width * 0.46),
+        panel_box[3] - bottom_clearance,
+    )
+    right_box = (
+        panel_box[0] + int(panel_width * 0.54),
+        panel_box[1] + top_clearance,
+        panel_box[0] + int(panel_width * 0.82),
+        panel_box[3] - bottom_clearance,
+    )
+    return [left_box, right_box]
+
+
 def _multi_bubble_geometries(
     image: Image.Image,
     panel_box: tuple[int, int, int, int],
@@ -309,24 +403,47 @@ def _multi_bubble_geometries(
     num_groups: int,
     render_version: int,
 ) -> list[dict[str, Any]]:
-    del panel_index
     box_width, box_height = _estimate_bubble_size(panel_box, num_groups=num_groups, render_version=render_version)
+    protected_boxes = _character_safe_boxes(panel_box, panel_index)
+    preferred_label = "bottom" if panel_index % 2 == 0 else "top"
+
+    def _candidate_score(item: dict[str, Any], chosen: list[dict[str, Any]]) -> float:
+        overlap_area_penalty = sum(_overlap_area(item["box"], protected) * 0.03 for protected in protected_boxes)
+        overlap_ratio_penalty = 0.0
+        bubble_area = max(1, (item["box"][2] - item["box"][0]) * (item["box"][3] - item["box"][1]))
+        for protected in protected_boxes:
+            overlap_ratio = _overlap_area(item["box"], protected) / bubble_area
+            if overlap_ratio >= 0.18:
+                overlap_ratio_penalty += 8000.0
+            elif overlap_ratio >= 0.10:
+                overlap_ratio_penalty += 2400.0
+            elif overlap_ratio >= 0.05:
+                overlap_ratio_penalty += 700.0
+        position_penalty = 0.0 if item["label"] in {preferred_label, "ceiling"} else 80.0
+        if preferred_label == "top" and item["label"] == "ceiling":
+            position_penalty -= 80.0
+        if item["label"] in {"upper_mid", "lower_mid"}:
+            position_penalty += 140.0
+        existing_overlap_penalty = sum(1200.0 for previous in chosen if _boxes_overlap(item["box"], previous["box"]))
+        return (
+            _visual_density_score(image, item["box"])
+            + overlap_area_penalty
+            + overlap_ratio_penalty
+            + position_penalty
+            + existing_overlap_penalty
+        )
 
     if num_groups <= 1:
         candidates = []
         for side in ("left", "center", "right"):
             candidates.extend(_candidate_boxes(panel_box, box_width=box_width, box_height=box_height, side=side))
-        best = min(candidates, key=lambda item: _visual_density_score(image, item["box"]))
+        best = min(candidates, key=lambda item: _candidate_score(item, []))
         return [{"box": best["box"], "v_pos": best["v_pos"], "side": best["side"]}]
 
     chosen: list[dict[str, Any]] = []
     for side in ("left", "right"):
         side_candidates = _candidate_boxes(panel_box, box_width=box_width, box_height=box_height, side=side)
-        best = min(
-            side_candidates,
-            key=lambda item: _visual_density_score(image, item["box"])
-            + sum(400.0 for previous in chosen if _boxes_overlap(item["box"], previous["box"])),
-        )
+        best = min(side_candidates, key=lambda item: _candidate_score(item, chosen))
         chosen.append({"box": best["box"], "v_pos": best["v_pos"], "side": best["side"]})
     return chosen[:num_groups]
 
@@ -385,7 +502,6 @@ def _draw_speech_bubble(
 
     return [(tip_x, tip_y)]
 
-
 def _render_bubble_with_text(
     draw: ImageDraw.ImageDraw,
     font_path: Path | None,
@@ -399,50 +515,119 @@ def _render_bubble_with_text(
 ) -> dict[str, Any] | None:
     """Render one speech bubble with dialogue lines. Returns layout info or None."""
     x1, y1, x2, y2 = bubble_box
-    padding_x = 28
-    padding_y = 20
-    max_text_width = max(60, (x2 - x1) - padding_x * 2)
-    del render_version
-    base_font_size = DEFAULT_BUBBLE_FONT_SIZE
-    font = _load_font(font_path, base_font_size)
+    shrink_step = max(0, render_version - 1)
+    start_padding_x = max(MIN_BUBBLE_PADDING_X, 28 - shrink_step * 3)
+    start_padding_y = max(MIN_BUBBLE_PADDING_Y, 20 - shrink_step * 2)
+    base_font_size = max(MIN_BUBBLE_FONT_SIZE, DEFAULT_BUBBLE_FONT_SIZE - shrink_step * 2)
+    line_gap = max(MIN_BUBBLE_LINE_GAP, BUBBLE_LINE_GAP - shrink_step)
+    best_choice: dict[str, Any] | None = None
+    best_overflow = float("inf")
 
-    wrapped_lines: list[str] = []
-    for line in lines:
-        wrapped_lines.extend(_compute_text_lines(draw, normalize_dialogue_text(str(line)), font, max_text_width))
-    if not wrapped_lines:
-        return None
+    for font_size in range(base_font_size, ABSOLUTE_MIN_BUBBLE_FONT_SIZE - 1, -2):
+        font = _load_font(font_path, font_size)
+        for padding_x, padding_y in (
+            (start_padding_x, start_padding_y),
+            (max(MIN_BUBBLE_PADDING_X, start_padding_x - 4), max(MIN_BUBBLE_PADDING_Y, start_padding_y - 2)),
+            (MIN_BUBBLE_PADDING_X, MIN_BUBBLE_PADDING_Y),
+        ):
+            max_text_width = max(48, (x2 - x1) - padding_x * 2)
+            wrapped_lines: list[str] = []
+            for line in lines:
+                wrapped_lines.extend(_compute_text_lines(draw, normalize_dialogue_text(str(line)), font, max_text_width))
+            if not wrapped_lines:
+                continue
 
-    while True:
-        line_height = draw.textbbox((0, 0), "한Ag", font=font)[3]
-        total_text_height = len(wrapped_lines) * line_height + max(0, len(wrapped_lines) - 1) * BUBBLE_LINE_GAP
-        if total_text_height <= (y2 - y1) - padding_y * 2 or base_font_size <= MIN_BUBBLE_FONT_SIZE:
+            line_metrics = [draw.textbbox((0, 0), line, font=font) for line in wrapped_lines]
+            line_heights = [bbox[3] - bbox[1] for bbox in line_metrics]
+            max_line_width = max((bbox[2] - bbox[0]) for bbox in line_metrics) if line_metrics else 0
+            total_text_height = sum(line_heights) + max(0, len(line_heights) - 1) * line_gap
+            available_width = (x2 - x1) - padding_x * 2
+            available_height = (y2 - y1) - padding_y * 2
+            predicted_cursor_y = y1 + max(padding_y, ((y2 - y1) - total_text_height) // 2)
+            predicted_boxes: list[tuple[int, int, int, int]] = []
+            for line, line_bbox in zip(wrapped_lines, line_metrics, strict=False):
+                line_w = line_bbox[2] - line_bbox[0]
+                centered_x = x1 + ((x2 - x1) - line_w) // 2
+                max_text_x = max(x1 + padding_x, x2 - padding_x - line_w)
+                text_x = min(max(x1 + padding_x, centered_x), max_text_x)
+                text_y = predicted_cursor_y - line_bbox[1]
+                predicted_boxes.append(draw.textbbox((text_x, text_y), line, font=font))
+                predicted_cursor_y += (line_bbox[3] - line_bbox[1]) + line_gap
+
+            box_overflow = 0
+            for left, top, right, bottom in predicted_boxes:
+                box_overflow += max(0, x1 - left)
+                box_overflow += max(0, y1 - top)
+                box_overflow += max(0, right - x2)
+                box_overflow += max(0, bottom - y2)
+            overflow_amount = (
+                max(0, max_line_width - available_width)
+                + max(0, total_text_height - available_height) * 2
+                + box_overflow * 4
+            )
+            candidate = {
+                "font": font,
+                "font_size": font_size,
+                "padding_x": padding_x,
+                "padding_y": padding_y,
+                "wrapped_lines": wrapped_lines,
+                "line_metrics": line_metrics,
+                "predicted_boxes": predicted_boxes,
+                "line_gap": line_gap,
+                "fits": (
+                    max_line_width <= available_width
+                    and box_overflow == 0
+                ),
+                "total_text_height": total_text_height,
+            }
+            if candidate["fits"]:
+                best_choice = candidate
+                best_overflow = 0.0
+                break
+            if overflow_amount < best_overflow:
+                best_overflow = overflow_amount
+                best_choice = candidate
+        if best_overflow == 0.0:
             break
-        base_font_size -= 2
-        font = _load_font(font_path, base_font_size)
-        wrapped_lines = []
-        for line in lines:
-            wrapped_lines.extend(_compute_text_lines(draw, normalize_dialogue_text(str(line)), font, max_text_width))
+
+    if best_choice is None:
+        return None
+    font = best_choice["font"]
+    base_font_size = best_choice["font_size"]
+    padding_x = best_choice["padding_x"]
+    padding_y = best_choice["padding_y"]
+    wrapped_lines = best_choice["wrapped_lines"]
+    line_metrics = best_choice["line_metrics"]
+    predicted_boxes = best_choice["predicted_boxes"]
+    text_fit_ok = bool(best_choice["fits"])
 
     tail_circles = _draw_speech_bubble(
         draw, bubble_box, panel_index,
         vertical_position=vertical_position, tail_side=tail_side,
     )
 
-    line_height = draw.textbbox((0, 0), "한Ag", font=font)[3]
-    total_text_h = len(wrapped_lines) * line_height + max(0, len(wrapped_lines) - 1) * BUBBLE_LINE_GAP
+    line_heights = [bbox[3] - bbox[1] for bbox in line_metrics]
+    total_text_h = best_choice["total_text_height"]
     cursor_y = y1 + max(padding_y, ((y2 - y1) - total_text_h) // 2)
-    for line in wrapped_lines:
-        line_bbox = draw.textbbox((0, 0), line, font=font)
+    line_boxes: list[tuple[int, int, int, int]] = []
+    for line, line_bbox, predicted_box in zip(wrapped_lines, line_metrics, predicted_boxes, strict=False):
         line_w = line_bbox[2] - line_bbox[0]
-        text_x = x1 + max(padding_x, ((x2 - x1) - line_w) // 2)
-        draw.text((text_x, cursor_y), line, font=font, fill=(20, 20, 20, 255))
-        cursor_y += (line_bbox[3] - line_bbox[1]) + BUBBLE_LINE_GAP
+        centered_x = x1 + ((x2 - x1) - line_w) // 2
+        max_text_x = max(x1 + padding_x, x2 - padding_x - line_w)
+        text_x = min(max(x1 + padding_x, centered_x), max_text_x)
+        text_y = cursor_y - line_bbox[1]
+        draw.text((text_x, text_y), line, font=font, fill=(20, 20, 20, 255))
+        text_box = draw.textbbox((text_x, text_y), line, font=font)
+        line_boxes.append(text_box)
+        cursor_y += max(predicted_box[3] - predicted_box[1], line_bbox[3] - line_bbox[1]) + line_gap
 
     return {
         "bubble_box": [x1, y1, x2, y2],
         "dialogue_lines": wrapped_lines,
         "font_size": base_font_size,
         "tail_circles": tail_circles,
+        "text_boxes": [list(box) for box in line_boxes],
+        "text_fit_ok": text_fit_ok,
     }
 
 
@@ -472,12 +657,13 @@ def render_text_boxes(
         if not dialogue_lines:
             continue
 
-        groups = split_dialogue_groups(dialogue_lines)
-        geoms = _multi_bubble_geometries(canvas, boxes[index], index, len(groups), render_version)
+        panel_index = max(0, int(panel.get("panel_no", index + 1)) - 1)
+        groups = _speaker_groups_for_panel(panel)
+        geoms = _multi_bubble_geometries(canvas, boxes[index], panel_index, len(groups), render_version)
         bubble_items: list[dict[str, Any]] = []
         for group_lines, geom in zip(groups, geoms, strict=False):
             result = _render_bubble_with_text(
-                draw, font_path, group_lines, geom["box"], index,
+                draw, font_path, group_lines, geom["box"], panel_index,
                 vertical_position=geom["v_pos"], tail_side=geom["side"],
                 render_version=render_version,
             )
@@ -490,10 +676,14 @@ def render_text_boxes(
         all_wrapped: list[str] = []
         all_tails: list[tuple[int, int]] = []
         all_boxes: list[list[int]] = []
+        all_text_boxes: list[list[int]] = []
+        all_text_fit_flags: list[bool] = []
         for item in bubble_items:
             all_wrapped.extend(item["dialogue_lines"])
             all_tails.extend(item["tail_circles"])
             all_boxes.append(item["bubble_box"])
+            all_text_boxes.extend(item.get("text_boxes", []))
+            all_text_fit_flags.append(bool(item.get("text_fit_ok", True)))
 
         layout.append({
             "panel_no": panel.get("panel_no", index + 1),
@@ -503,6 +693,8 @@ def render_text_boxes(
             "dialogue_lines": all_wrapped,
             "font_size": bubble_items[0]["font_size"],
             "tail_circles": all_tails,
+            "text_boxes": all_text_boxes,
+            "text_fit_flags": all_text_fit_flags,
         })
 
     output = io.BytesIO()
@@ -515,10 +707,81 @@ def render_text_boxes(
     }
 
 
+def review_bubble_layout(layout: list[dict[str, Any]]) -> dict[str, Any]:
+    if not layout:
+        return {"has_issues": False, "issues": [], "panel_scores": [], "soft_score": 1.0}
+
+    panel_scores: list[dict[str, Any]] = []
+    issues: list[str] = []
+
+    for entry in layout:
+        panel_no = int(entry.get("panel_no", 0) or 0)
+        panel_box = tuple(entry.get("panel_box", []))
+        bubble_boxes = entry.get("bubble_boxes", [])
+        text_boxes = entry.get("text_boxes", [])
+        text_fit_flags = entry.get("text_fit_flags", [])
+        if len(panel_box) != 4 or not bubble_boxes:
+            panel_scores.append({"panel_no": panel_no, "score": 1.0, "max_overlap_ratio": 0.0})
+            continue
+
+        safe_boxes = _character_safe_boxes(panel_box, max(0, panel_no - 1))
+        max_overlap_ratio = 0.0
+        for raw_bubble_box in bubble_boxes:
+            bubble_box = tuple(raw_bubble_box)
+            if len(bubble_box) != 4:
+                continue
+            bubble_area = max(1, (bubble_box[2] - bubble_box[0]) * (bubble_box[3] - bubble_box[1]))
+            overlap_ratio = max(_overlap_area(bubble_box, safe_box) / bubble_area for safe_box in safe_boxes)
+            max_overlap_ratio = max(max_overlap_ratio, overlap_ratio)
+
+        if max_overlap_ratio >= 0.18:
+            issues.append(f"패널 {panel_no} 말풍선이 캐릭터 보호 구역을 심하게 침범합니다.")
+        elif max_overlap_ratio >= 0.10:
+            issues.append(f"패널 {panel_no} 말풍선이 캐릭터를 가릴 가능성이 큽니다.")
+
+        for text_box in text_boxes:
+            if len(text_box) != 4:
+                continue
+            if not any(
+                text_box[0] >= bubble_box[0]
+                and text_box[1] >= bubble_box[1]
+                and text_box[2] <= bubble_box[2]
+                and text_box[3] <= bubble_box[3]
+                for bubble_box in bubble_boxes
+            ):
+                issues.append(f"패널 {panel_no} 말풍선 텍스트가 버블 밖으로 넘칩니다.")
+                break
+        if any(not bool(flag) for flag in text_fit_flags):
+            issues.append(f"패널 {panel_no} 말풍선 텍스트가 버블 안에 안정적으로 맞지 않습니다.")
+
+        score = max(0.0, 1.0 - (max_overlap_ratio / 0.18))
+        if any(not bool(flag) for flag in text_fit_flags):
+            score = min(score, 0.45)
+        panel_scores.append(
+            {
+                "panel_no": panel_no,
+                "score": round(score, 3),
+                "max_overlap_ratio": round(max_overlap_ratio, 3),
+            }
+        )
+
+    soft_score = round(sum(item["score"] for item in panel_scores) / len(panel_scores), 3) if panel_scores else 1.0
+    has_issues = any(item["max_overlap_ratio"] >= 0.18 for item in panel_scores) or any(
+        "말풍선 텍스트가 버블" in issue for issue in issues
+    )
+    return {
+        "has_issues": has_issues,
+        "issues": issues,
+        "panel_scores": panel_scores,
+        "soft_score": soft_score,
+    }
+
+
 def render_thumbnail_card(
     base_image_bytes: bytes,
     *,
     title: str,
+    subtitle: str = "",
     topic: str,
     settings: WebtoonSettings,
 ) -> dict[str, Any]:
@@ -577,7 +840,8 @@ def render_thumbnail_card(
     # --- subtitle (topic) ---
     subtitle_font_size = max(24, width // 26)
     subtitle_font = _load_font(font_path, subtitle_font_size)
-    subtitle_text = sanitize_public_text(topic.strip(), fallback="")
+    subtitle_source = subtitle.strip() or topic.strip()
+    subtitle_text = sanitize_public_text(subtitle_source, fallback="")
     if subtitle_text and subtitle_text != title_text:
         subtitle_lines = _compute_text_lines(draw, subtitle_text, subtitle_font, title_max_width)
         subtitle_lines = subtitle_lines[:2]
@@ -598,6 +862,7 @@ def render_thumbnail_card(
         "layout": {
             "title_lines": title_lines,
             "subtitle_lines": subtitle_lines,
-            "topic": subtitle_text,
+            "subtitle": subtitle_text,
+            "topic": sanitize_public_text(topic.strip(), fallback=""),
         },
     }
