@@ -17,6 +17,9 @@ from agents.webtoon.text_renderer import (
     flatten_panel_dialogues,
     get_four_panel_boxes,
     get_single_panel_box,
+    render_thumbnail_card,
+    render_text_boxes,
+    review_bubble_layout,
     resolve_font_path,
     split_dialogue_groups,
 )
@@ -87,6 +90,13 @@ class TestWrapText:
     def test_empty_text(self):
         result = _wrap_text(self.draw, "", self.font, 100)
         assert result == [""]
+
+    def test_breaks_single_long_token_to_fit_width(self):
+        result = _wrap_text(self.draw, "SUPERCALIFRAGILISTICEXPIALIDOCIOUS", self.font, 30)
+        assert len(result) >= 2
+        for line in result:
+            bbox = self.draw.textbbox((0, 0), line, font=self.font)
+            assert bbox[2] - bbox[0] <= 30
 
 
 class TestComputeTextLines:
@@ -163,3 +173,309 @@ class TestComposeFourPanelCanvas:
         assert result["image_bytes"][:8] == b"\x89PNG\r\n\x1a\n"
         assert len(result["panel_boxes"]) == 4
         assert len(result["canvas_size"]) == 2
+
+
+class TestRenderTextBoxes:
+    def _make_base_image(self, size=(768, 768)):
+        img = Image.new("RGB", size, color=(245, 245, 245))
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+    def test_uses_panel_number_for_vertical_bubble_placement(self):
+        settings = _make_dummy_settings()
+        odd_panel = {
+            "panel_no": 1,
+            "speaker_dialogues": [
+                {"speaker": "kolla", "dialogue_lines": ["공항 도착!"]},
+                {"speaker": "zero", "dialogue_lines": ["환승부터 하자"]},
+            ],
+            "dialogue_lines": ["공항 도착!", "환승부터 하자"],
+        }
+        even_panel = {
+            "panel_no": 2,
+            "speaker_dialogues": [
+                {"speaker": "kolla", "dialogue_lines": ["표 좀 뽑아볼게"]},
+                {"speaker": "zero", "dialogue_lines": ["버튼이 너무 많아"]},
+            ],
+            "dialogue_lines": ["표 좀 뽑아볼게", "버튼이 너무 많아"],
+        }
+
+        odd_result = render_text_boxes(self._make_base_image(), [odd_panel], settings)
+        even_result = render_text_boxes(self._make_base_image(), [even_panel], settings)
+
+        odd_first_box = odd_result["layout"][0]["bubble_boxes"][0]
+        even_first_box = even_result["layout"][0]["bubble_boxes"][0]
+        assert odd_first_box[1] != even_first_box[1]
+        assert odd_first_box[1] > 400
+        assert even_first_box[1] < 120
+
+    def test_higher_render_version_reduces_bubble_overlap(self):
+        settings = _make_dummy_settings()
+        panel = {
+            "panel_no": 1,
+            "speaker_dialogues": [
+                {"speaker": "kolla", "dialogue_lines": ["드디어 도착했다", "공항이 생각보다 더 복잡하다"]},
+                {"speaker": "zero", "dialogue_lines": ["전광판부터 확인하고", "입국장으로 바로 이동하자"]},
+            ],
+            "dialogue_lines": [
+                "드디어 도착했다",
+                "공항이 생각보다 더 복잡하다",
+                "전광판부터 확인하고",
+                "입국장으로 바로 이동하자",
+            ],
+        }
+
+        v1 = render_text_boxes(self._make_base_image(), [panel], settings, render_version=1)
+        v3 = render_text_boxes(self._make_base_image(), [panel], settings, render_version=3)
+        review_v1 = review_bubble_layout(v1["layout"])
+        review_v3 = review_bubble_layout(v3["layout"])
+
+        box_v1 = v1["layout"][0]["bubble_boxes"][0]
+        box_v3 = v3["layout"][0]["bubble_boxes"][0]
+        area_v1 = (box_v1[2] - box_v1[0]) * (box_v1[3] - box_v1[1])
+        area_v3 = (box_v3[2] - box_v3[0]) * (box_v3[3] - box_v3[1])
+
+        assert area_v3 < area_v1
+        assert review_v3["panel_scores"][0]["max_overlap_ratio"] <= review_v1["panel_scores"][0]["max_overlap_ratio"]
+
+    def test_long_dialogue_text_stays_inside_bubble_bounds(self):
+        settings = _make_dummy_settings()
+        panel = {
+            "panel_no": 1,
+            "speaker_dialogues": [
+                {
+                    "speaker": "kolla",
+                    "dialogue_lines": [
+                        "독일 입국은 처음이라서 표지판 하나하나를 다 읽어보게 된다",
+                        "그래도 너무 긴장하지 말고 순서대로 가 보자",
+                    ],
+                },
+                {
+                    "speaker": "zero",
+                    "dialogue_lines": [
+                        "여권이랑 입국 서류부터 다시 한 번 확인하자",
+                        "말풍선 밖으로 텍스트가 넘치면 안 된다",
+                    ],
+                },
+            ],
+            "dialogue_lines": [
+                "독일 입국은 처음이라서 표지판 하나하나를 다 읽어보게 된다",
+                "그래도 너무 긴장하지 말고 순서대로 가 보자",
+                "여권이랑 입국 서류부터 다시 한 번 확인하자",
+                "말풍선 밖으로 텍스트가 넘치면 안 된다",
+            ],
+        }
+
+        result = render_text_boxes(self._make_base_image(), [panel], settings, render_version=3)
+        layout = result["layout"][0]
+        review = review_bubble_layout(result["layout"])
+
+        assert review["has_issues"] is False
+        assert all(layout["text_fit_flags"])
+        for text_box in layout["text_boxes"]:
+            assert any(
+                text_box[0] >= bubble_box[0]
+                and text_box[1] >= bubble_box[1]
+                and text_box[2] <= bubble_box[2]
+                and text_box[3] <= bubble_box[3]
+                for bubble_box in layout["bubble_boxes"]
+            )
+
+    def test_text_boxes_stay_inside_bubbles_for_dense_dialogue(self):
+        settings = _make_dummy_settings()
+        panel = {
+            "panel_no": 1,
+            "speaker_dialogues": [
+                {"speaker": "kolla", "dialogue_lines": ["이 줄은 꽤 길어서 말풍선 안에서 여러 줄로 안정적으로 접혀야 해."]},
+                {"speaker": "zero", "dialogue_lines": ["여기도 마찬가지로 말풍선 밖으로 절대 튀어나가면 안 돼."]},
+            ],
+            "dialogue_lines": [
+                "이 줄은 꽤 길어서 말풍선 안에서 여러 줄로 안정적으로 접혀야 해.",
+                "여기도 마찬가지로 말풍선 밖으로 절대 튀어나가면 안 돼.",
+            ],
+        }
+
+        result = render_text_boxes(self._make_base_image(), [panel], settings, render_version=3)
+
+        assert result["layout"]
+        layout = result["layout"][0]
+        assert layout["text_boxes"]
+        assert layout["text_fit_flags"] == [True, True]
+        for text_box in layout["text_boxes"]:
+            assert any(
+                text_box[0] >= bubble_box[0]
+                and text_box[1] >= bubble_box[1]
+                and text_box[2] <= bubble_box[2]
+                and text_box[3] <= bubble_box[3]
+                for bubble_box in layout["bubble_boxes"]
+            )
+
+    def test_long_unspaced_tokens_stay_inside_bubbles(self):
+        settings = _make_dummy_settings()
+        panel = {
+            "panel_no": 1,
+            "speaker_dialogues": [
+                {"speaker": "kolla", "dialogue_lines": ["SUPERCALIFRAGILISTICEXPIALIDOCIOUS", "독일입국심사대기줄이생각보다훨씬길다"]},
+                {"speaker": "zero", "dialogue_lines": ["BAGGAGECLAIMGATEA12ONTIME", "여권이랑서류를다시한번확인해보자"]},
+            ],
+            "dialogue_lines": [
+                "SUPERCALIFRAGILISTICEXPIALIDOCIOUS",
+                "독일입국심사대기줄이생각보다훨씬길다",
+                "BAGGAGECLAIMGATEA12ONTIME",
+                "여권이랑서류를다시한번확인해보자",
+            ],
+        }
+
+        result = render_text_boxes(self._make_base_image(), [panel], settings, render_version=2)
+
+        assert result["layout"]
+        layout = result["layout"][0]
+        assert layout["text_fit_flags"] == [True, True]
+        for text_box in layout["text_boxes"]:
+            assert any(
+                text_box[0] >= bubble_box[0]
+                and text_box[1] >= bubble_box[1]
+                and text_box[2] <= bubble_box[2]
+                and text_box[3] <= bubble_box[3]
+                for bubble_box in layout["bubble_boxes"]
+            )
+
+
+class TestRenderThumbnailCard:
+    def _make_base_image(self, size=(768, 768)):
+        img = Image.new("RGB", size, color=(80, 100, 120))
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+    def test_prefers_explicit_subtitle_over_topic(self):
+        settings = _make_dummy_settings()
+
+        result = render_thumbnail_card(
+            self._make_base_image(),
+            title="독일 도착!",
+            subtitle="첫 관문은 기차표 끊기?",
+            topic="독일 첫 입국",
+            settings=settings,
+        )
+
+        assert result["layout"]["title_lines"] == ["독일 도착!"]
+        assert "첫 관문은 기차표 끊기?" in result["layout"]["subtitle_lines"]
+        assert result["layout"]["subtitle"] == "첫 관문은 기차표 끊기?"
+        assert result["layout"]["topic"] == "독일 첫 입국"
+
+
+class TestReviewBubbleLayout:
+    def test_returns_hard_issue_for_severe_overlap(self):
+        review = review_bubble_layout(
+            [
+                {
+                    "panel_no": 1,
+                    "panel_box": [28, 24, 772, 576],
+                    "bubble_boxes": [[110, 120, 360, 360]],
+                }
+            ]
+        )
+
+        assert review["has_issues"] is True
+        assert review["panel_scores"][0]["max_overlap_ratio"] >= 0.18
+
+    def test_scores_safe_layout_as_pass(self):
+        review = review_bubble_layout(
+            [
+                {
+                    "panel_no": 1,
+                    "panel_box": [28, 24, 772, 576],
+                    "bubble_boxes": [[360, 40, 430, 90]],
+                }
+            ]
+        )
+
+        assert review["has_issues"] is False
+        assert review["soft_score"] > 0.8
+
+    def test_flags_text_overflow_outside_bubble(self):
+        review = review_bubble_layout(
+            [
+                {
+                    "panel_no": 1,
+                    "panel_box": [28, 24, 772, 576],
+                    "bubble_boxes": [[360, 40, 430, 90]],
+                    "text_boxes": [[350, 45, 440, 80]],
+                    "text_fit_flags": [False],
+                }
+            ]
+        )
+
+        assert review["has_issues"] is True
+        assert any("말풍선 텍스트가 버블" in issue for issue in review["issues"])
+
+
+class TestRenderTextBoxesLayout:
+    def _make_base_image(self, size=(928, 1120)):
+        img = Image.new("RGB", size, color=(245, 240, 232))
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+    def test_odd_panel_keeps_top_bubble_band_clear_of_character_safe_boxes(self):
+        settings = _make_dummy_settings()
+        result = render_text_boxes(
+            self._make_base_image(),
+            [
+                {
+                    "panel_no": 1,
+                    "speaker_dialogues": [
+                        {"speaker": "kolla", "dialogue_lines": ["드디어 도착했다!", "공기부터 다르네!"]},
+                        {"speaker": "zero", "dialogue_lines": ["이제 시작이야.", "여권 잘 챙겼지?"]},
+                    ],
+                    "dialogue_lines": ["드디어 도착했다!", "공기부터 다르네!", "이제 시작이야.", "여권 잘 챙겼지?"],
+                }
+            ],
+            settings,
+            render_version=2,
+        )
+
+        review = review_bubble_layout(result["layout"])
+
+        assert review["has_issues"] is False
+        assert review["panel_scores"][0]["max_overlap_ratio"] < 0.18
+
+    def test_even_panel_keeps_bottom_bubble_band_clear_of_character_safe_boxes(self):
+        settings = _make_dummy_settings()
+        result = render_text_boxes(
+            self._make_base_image(),
+            [
+                {
+                    "panel_no": 2,
+                    "speaker_dialogues": [
+                        {"speaker": "kolla", "dialogue_lines": ["줄이 왜 이렇게 길어?", "금방 끝나겠지?"]},
+                        {"speaker": "zero", "dialogue_lines": ["질문에 대답 잘해야 해.", "긴장 늦추지 마."]},
+                    ],
+                    "dialogue_lines": ["줄이 왜 이렇게 길어?", "금방 끝나겠지?", "질문에 대답 잘해야 해.", "긴장 늦추지 마."],
+                }
+            ],
+            settings,
+            render_version=2,
+        )
+
+        review = review_bubble_layout(result["layout"])
+
+        assert review["has_issues"] is False
+        assert review["panel_scores"][0]["max_overlap_ratio"] < 0.18
+
+
+def _make_dummy_settings(**overrides) -> WebtoonSettings:
+    defaults = {
+        "google_oauth_client_secret_file": Path("/tmp/fake-secret.json"),
+        "google_oauth_token_file": Path("/tmp/fake-token.json"),
+        "google_drive_root_folder_id": "fake-folder-id",
+        "google_sheets_spreadsheet_id": "fake-sheet-id",
+        "gemini_api_key": "fake-image-key",
+        "instagram_access_token": "fake-token",
+        "instagram_business_account_id": "fake-account-id",
+        "approval_default_user": "tester",
+    }
+    defaults.update(overrides)
+    return WebtoonSettings(**defaults)
