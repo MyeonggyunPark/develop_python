@@ -471,10 +471,7 @@ def _make_dummy_settings(**overrides) -> WebtoonSettings:
         "google_oauth_client_secret_file": Path("/tmp/fake-secret.json"),
         "google_oauth_token_file": Path("/tmp/fake-token.json"),
         "google_drive_root_folder_id": "fake-folder-id",
-        "google_sheets_spreadsheet_id": "fake-sheet-id",
         "gemini_api_key": "fake-image-key",
-        "instagram_access_token": "fake-token",
-        "instagram_business_account_id": "fake-account-id",
         "approval_default_user": "tester",
     }
     defaults.update(overrides)

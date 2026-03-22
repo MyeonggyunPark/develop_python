@@ -11,6 +11,7 @@ from agents.webtoon.clients import (
     GeminiOcrClient,
     GeminiTextClient,
     _build_thinking_config,
+    _compact_image_prompt_for_model,
     _extract_json_object,
     build_smoke_test_image_bytes,
     clean_ocr_text,
@@ -71,6 +72,37 @@ class TestThinkingConfig:
         config = _build_thinking_config("gemini-3-flash-preview", "high")
         assert config is not None
         assert str(config.thinking_level).endswith("HIGH")
+
+
+class TestImagePromptCompaction:
+    def test_compacts_long_prompt_for_gemini_2_5_image_models(self):
+        long_prompt = "\n".join(
+            [
+                "intro line",
+                "Korean digital webtoon style, bold clean outlines",
+                "Kolla should appear slightly larger than Zero, about 10 to 15 percent bigger in body scale",
+                "Keep the Kolla-to-Zero size ratio stable across the whole episode",
+                "exactly two recurring cat protagonists only",
+                "strictly upright bipedal posture",
+                "The characters do NOT wear any clothing, shoes, or accessories. They have natural fur only.",
+                "Do NOT draw any speech bubbles, dialogue text, or captions in the image.",
+                "썸네일은 1컷의 반복이 아니라 별도의 예고 장면이어야 한다. 1컷과 같은 나란히 서기 포즈는 피한다.",
+                "본문 1~6컷 어느 곳에서도 썸네일의 배경 구조, 서브로케이션, 카메라 거리, 대표 간판, 대표 소품 배치를 다시 사용하면 안 된다.",
+                "이 이미지는 단일 패널 한 컷만 담아야 한다. 위아래 두 장면, 좌우 분할, 반복된 동일 장면, 만화 페이지처럼 여러 컷이 섞인 구도를 절대 만들지 않는다.",
+                "Show these key props clearly: passport, suitcase.",
+            ]
+            + ["filler"] * 800
+        )
+
+        compacted = _compact_image_prompt_for_model(long_prompt, "gemini-2.5-flash-image")
+
+        assert len(compacted) < len(long_prompt)
+        assert "Korean digital webtoon style" in compacted
+        assert "Do NOT draw any speech bubbles" in compacted
+        assert "본문 1~6컷 어느 곳에서도" in compacted
+        assert "단일 패널 한 컷만 담아야" in compacted
+        # Duplicate "filler" lines should be collapsed to at most one occurrence.
+        assert compacted.count("filler") <= 1
 
 
 class TestBuildSmokeTestImage:
@@ -275,7 +307,7 @@ class TestGeminiClientApiKeys:
         client = GeminiImageClient(
             _make_dummy_settings(
                 gemini_api_key="image-key",
-                image_model="gemini-2.5-flash-image",
+                image_model="gemini-3.1-flash-image-preview",
             )
         )
 
@@ -283,9 +315,9 @@ class TestGeminiClientApiKeys:
 
         assert image_bytes == b"fake-image"
         assert mime_type == "image/png"
-        assert captured_models == ["gemini-2.5-flash-image"]
+        assert captured_models == ["gemini-3.1-flash-image-preview"]
         assert captured_modalities == [["IMAGE"]]
-        assert client.last_generation_model == "gemini-2.5-flash-image"
+        assert client.last_generation_model == "gemini-3.1-flash-image-preview"
 
     def test_image_client_prunes_reference_inputs_before_last_retry(self, monkeypatch):
         captured_lengths: list[int] = []
@@ -331,6 +363,46 @@ class TestGeminiClientApiKeys:
         assert image_bytes == b"fake-image"
         assert mime_type == "image/png"
         assert captured_lengths == [6, 4, 4]
+
+    def test_image_client_prunes_first_attempt_references_for_gemini_2_5(self, monkeypatch):
+        captured_lengths: list[int] = []
+
+        class FakeInlineData:
+            mime_type = "image/png"
+            data = b"fake-image"
+
+        class FakePart:
+            def __init__(self, text=None, inline_data=None):
+                self.text = text
+                self.inline_data = inline_data
+
+        class FakeModels:
+            def generate_content(self, *, model, contents, config):
+                del model, config
+                captured_lengths.append(len(contents))
+                return type("Response", (), {"parts": [FakePart(inline_data=FakeInlineData())]})()
+
+        class FakeGenaiClient:
+            def __init__(self, *, api_key, http_options):
+                del api_key, http_options
+                self.models = FakeModels()
+
+        monkeypatch.setattr("agents.webtoon.clients.genai.Client", FakeGenaiClient)
+        monkeypatch.setattr(
+            "agents.webtoon.clients.types.Part.from_bytes",
+            lambda *, data, mime_type: {"data": data, "mime_type": mime_type},
+        )
+
+        client = GeminiImageClient(
+            _make_dummy_settings(gemini_api_key="image-key", image_model="gemini-2.5-flash-image")
+        )
+        references = [(f"img-{idx}".encode(), "image/png") for idx in range(5)]
+
+        image_bytes, mime_type, _ = client.generate_image("prompt", reference_images=references, max_retries=1)
+
+        assert image_bytes == b"fake-image"
+        assert mime_type == "image/png"
+        assert captured_lengths == [3]
 
     def test_image_client_keeps_only_master_references_on_final_edit_retry(self, monkeypatch):
         captured_lengths: list[int] = []
@@ -539,7 +611,7 @@ class TestStoryReviewPrompts:
         first_prompt = prompts[0]
         full_prompt = f"{captured_kwargs[0]['system_instruction']}\n{first_prompt}"
         assert captured_kwargs[0]["thinking_level"] == "high"
-        assert captured_kwargs[0]["cache_key"] == "creative-brief-v2"
+        assert captured_kwargs[0]["cache_key"] is None
         assert "생활형 에피소드 웹툰 기획자" in str(captured_kwargs[0]["system_instruction"])
         assert "독일생활 웹툰 기획자" not in full_prompt
         assert "출발 사건, 핵심 장소, 핵심 행동" in full_prompt
@@ -555,6 +627,86 @@ class TestStoryReviewPrompts:
         assert "key_props 배열과 carryover_props 배열을 반드시 넣으세요" in full_prompt
         assert "특정 주제 예시를 하드코딩하지 말고" in full_prompt
         assert "공항 입국, 환승, 비행, 수하물 찾기, 플랫폼 이동" not in full_prompt
+
+    def test_build_creative_brief_retries_with_compact_prompt_after_primary_failure(self, monkeypatch):
+        client = GeminiTextClient(_make_dummy_settings())
+        captured_kwargs: list[dict[str, object]] = []
+        call_count = {"value": 0}
+
+        def fake_generate_text(prompt: str, **kwargs):
+            call_count["value"] += 1
+            captured_kwargs.append(kwargs)
+            if call_count["value"] == 1:
+                raise RuntimeError("primary prompt timeout")
+            return json.dumps(
+                {
+                    "title": "제목",
+                    "thumbnail_subtitle": "설명 부제목",
+                    "episode_scope": "journey",
+                    "subtitle_scope": "journey",
+                    "scope_summary": "입국부터 환승까지 이어지는 여정",
+                    "image_prompt": "기본",
+                    "thumbnail_scene_prompt": "대표 장면",
+                    "caption": "캡션",
+                    "hashtags": [],
+                    "character_notes": "",
+                    "panels": [{"panel_no": index} for index in range(1, 7)],
+                },
+                ensure_ascii=False,
+            )
+
+        monkeypatch.setattr(client, "_generate_text", fake_generate_text)
+        monkeypatch.setattr(
+            client,
+            "_review_creative_brief",
+            lambda topic, payload: {"has_issues": False, "issues": [], "rewrite_instruction": ""},
+        )
+
+        payload = client.build_creative_brief("독일 첫 입국")
+
+        assert payload["title"] == "제목"
+        assert len(captured_kwargs) == 2
+        assert captured_kwargs[0]["thinking_level"] == "high"
+        assert captured_kwargs[0]["cache_key"] is None
+        assert captured_kwargs[1]["thinking_level"] == "medium"
+        assert captured_kwargs[1]["cache_key"] is None
+        assert "6컷 웹툰용 기획안" in str(captured_kwargs[1]["system_instruction"])
+
+    def test_build_creative_brief_uses_compact_prompt_for_gemini_2_5_models(self, monkeypatch):
+        client = GeminiTextClient(_make_dummy_settings(llm_model="gemini-2.5-flash"))
+        captured_kwargs: list[dict[str, object]] = []
+
+        def fake_generate_text(prompt: str, **kwargs):
+            captured_kwargs.append(kwargs)
+            return json.dumps(
+                {
+                    "title": "제목",
+                    "thumbnail_subtitle": "설명 부제목",
+                    "episode_scope": "journey",
+                    "subtitle_scope": "journey",
+                    "scope_summary": "입국부터 환승까지 이어지는 여정",
+                    "image_prompt": "기본",
+                    "thumbnail_scene_prompt": "대표 장면",
+                    "caption": "캡션",
+                    "hashtags": [],
+                    "character_notes": "",
+                    "panels": [{"panel_no": index} for index in range(1, 7)],
+                },
+                ensure_ascii=False,
+            )
+
+        monkeypatch.setattr(client, "_generate_text", fake_generate_text)
+        monkeypatch.setattr(
+            client,
+            "_review_creative_brief",
+            lambda topic, payload: {"has_issues": False, "issues": [], "rewrite_instruction": ""},
+        )
+
+        client.build_creative_brief("독일 첫 입국")
+
+        assert captured_kwargs[0]["thinking_level"] == "medium"
+        assert captured_kwargs[0]["cache_key"] is None
+        assert "6컷 웹툰용 기획안" in str(captured_kwargs[0]["system_instruction"])
 
     def test_normalize_brief_payload_derives_short_title_and_subtitle(self):
         client = GeminiTextClient(_make_dummy_settings())
@@ -600,6 +752,103 @@ class TestStoryReviewPrompts:
         assert payload["scope_summary"]
         assert payload["panels"][0]["key_props"] == ["여권", "입국 서류"]
         assert payload["panels"][1]["carryover_props"] == ["기차표"]
+        assert payload["character_notes"]
+        assert payload["image_prompt"] == (
+            "Korean digital webtoon style, bold clean outlines, vibrant colors, "
+            "expressive exaggerated facial expressions, dynamic poses, "
+            "anthropomorphic cats walking upright on two legs using front paws as hands, "
+            "manga-style emotion effects, detailed background"
+        )
+
+    def test_normalize_brief_payload_backfills_default_dialogues_when_missing(self):
+        client = GeminiTextClient(_make_dummy_settings())
+
+        payload = client._normalize_brief_payload(
+            "독일 첫 입국",
+            {
+                "title": "독일 도착",
+                "thumbnail_subtitle": "긴장되는 첫 심사",
+                "image_prompt": "기본",
+                "thumbnail_scene_prompt": "대표 장면",
+                "caption": "캡션",
+                "hashtags": [],
+                "character_notes": "콜라색 몸",
+                "panels": [
+                    {
+                        "panel_no": index,
+                        "story_role": "기" if index == 1 else "전",
+                        "location": f"장소 {index}",
+                        "speaker_dialogues": [],
+                    }
+                    for index in range(1, 7)
+                ],
+            },
+        )
+
+        assert "검은 단색 털" in payload["character_notes"]
+        assert payload["panels"][0]["speaker_dialogues"][0]["dialogue_lines"]
+        assert payload["panels"][0]["speaker_dialogues"][1]["dialogue_lines"]
+        assert all(len(line) <= 38 for line in payload["panels"][0]["dialogue_lines"])
+        assert "black-furred character with yellow eyes" in payload["panels"][0]["scene_prompt"]
+        assert "cola bottle" not in payload["panels"][0]["scene_prompt"].lower()
+
+    def test_normalize_brief_payload_replaces_overlong_dialogues_with_defaults(self):
+        client = GeminiTextClient(_make_dummy_settings())
+
+        payload = client._normalize_brief_payload(
+            "독일 첫 입국",
+            {
+                "title": "독일 도착",
+                "thumbnail_subtitle": "긴장되는 첫 심사",
+                "thumbnail_scene_prompt": "대표 장면",
+                "caption": "캡션",
+                "hashtags": [],
+                "panels": [
+                    {
+                        "panel_no": index,
+                        "story_role": "결" if index == 6 else "전",
+                        "location": f"장소 {index}",
+                        "speaker_dialogues": [
+                            {"speaker": "kolla", "dialogue_lines": ["이건 정말 말도 안 되게 긴 대사라서 기준을 넘어가도록 일부러 길게 만든 문장이다"]},
+                            {"speaker": "zero", "dialogue_lines": ["나도 엄청 길게 말해서 제한을 넘겨 보자고 일부러 늘인 대사야"]},
+                        ],
+                    }
+                    for index in range(1, 7)
+                ],
+            },
+        )
+
+        assert all(len(line) <= 38 for line in payload["panels"][0]["dialogue_lines"])
+        assert payload["panels"][0]["speaker_dialogues"][0]["dialogue_lines"] != [
+            "이건 정말 말도 안 되게 긴 대사라서 기준을 넘어가도록 일부러 길게 만든 문장이다"
+        ]
+
+    def test_normalize_episode_scope_prefers_single_location_when_only_sublocations_change(self):
+        client = GeminiTextClient(_make_dummy_settings())
+
+        payload = client._normalize_brief_payload(
+            "독일 첫 입국",
+            {
+                "title": "독일 입국",
+                "thumbnail_subtitle": "공항 안에서 벌어진 소동",
+                "episode_scope": "journey",
+                "subtitle_scope": "journey",
+                "thumbnail_scene_prompt": "공항 대표 장면",
+                "caption": "캡션",
+                "hashtags": [],
+                "character_notes": "",
+                "panels": [
+                    {"panel_no": 1, "location": "독일 공항, 도착 홀", "speaker_dialogues": []},
+                    {"panel_no": 2, "location": "독일 공항, 입국 심사 줄", "speaker_dialogues": []},
+                    {"panel_no": 3, "location": "독일 공항, 심사 데스크", "speaker_dialogues": []},
+                    {"panel_no": 4, "location": "독일 공항, 통과 복도", "speaker_dialogues": []},
+                    {"panel_no": 5, "location": "독일 공항, 수하물 벨트", "speaker_dialogues": []},
+                    {"panel_no": 6, "location": "독일 공항, 출구 앞", "speaker_dialogues": []},
+                ],
+            },
+        )
+
+        assert payload["episode_scope"] == "single_location"
 
     def test_review_prompt_demands_thumbnail_distinct_from_panels(self, monkeypatch):
         client = GeminiTextClient(_make_dummy_settings())
@@ -637,6 +886,7 @@ class TestStoryReviewPrompts:
         assert "여러 장소를 이동하는 여정형 이야기라면 thumbnail_subtitle도 그 전체를 포괄" in full_prompt
         assert "각 panel에는 key_props와 carryover_props가 있어야 합니다" in full_prompt
         assert "carryover_props에 적힌 이름은 이전 컷과 같은 표기를 유지" in full_prompt
+        assert "건네기/올려놓기/집어들기 같은 전이 행동" in full_prompt
 
     def test_rewrite_prompt_demands_thumbnail_teaser_shot(self, monkeypatch):
         client = GeminiTextClient(_make_dummy_settings())
@@ -669,7 +919,80 @@ class TestStoryReviewPrompts:
         assert "scope_summary는 title, thumbnail_subtitle, caption, panels가 공통으로 약속" in full_prompt
         assert "다음 컷에서도 같은 물건으로 유지하세요" in full_prompt
         assert "key_props, carryover_props" in full_prompt
+        assert "건네기/올려놓기/집어들기 같은 전이 행동" in full_prompt
         assert "특정 주제 예시를 박아넣지 말고" in full_prompt
+
+    def test_review_flags_abrupt_prop_state_change_without_transfer(self, monkeypatch):
+        client = GeminiTextClient(_make_dummy_settings())
+
+        def fake_generate_text(prompt: str, **kwargs):
+            return json.dumps({"has_issues": False, "issues": [], "rewrite_instruction": ""}, ensure_ascii=False)
+
+        monkeypatch.setattr(client, "_generate_text", fake_generate_text)
+
+        review = client._review_creative_brief(
+            "독일 첫 입국",
+            {
+                "thumbnail_scene_prompt": "공항 입구 전경",
+                "panels": [
+                    {
+                        "panel_no": 1,
+                        "location": "입국 심사 줄",
+                        "scene_prompt": "콜라가 은색 캐리어를 손에 끌고 서 있다",
+                        "key_props": ["은색 캐리어"],
+                        "carryover_props": [],
+                        "speaker_dialogues": [],
+                    },
+                    {
+                        "panel_no": 2,
+                        "location": "보안 검색대",
+                        "scene_prompt": "은색 캐리어가 벨트 위에 지나가고 둘이 바라본다",
+                        "key_props": ["은색 캐리어"],
+                        "carryover_props": ["은색 캐리어"],
+                        "speaker_dialogues": [],
+                    },
+                ],
+            },
+        )
+
+        assert review["has_issues"] is True
+        assert any("은색 캐리어" in issue and "전이 행동" in issue for issue in review["issues"])
+
+    def test_review_creative_brief_falls_back_to_deterministic_checks_when_json_is_invalid(self, monkeypatch):
+        client = GeminiTextClient(_make_dummy_settings())
+
+        def fake_generate_text(prompt: str, **kwargs):
+            return '{"has_issues": true, "issues": ["broken"]'
+
+        monkeypatch.setattr(client, "_generate_text", fake_generate_text)
+
+        review = client._review_creative_brief(
+            "독일 첫 입국",
+            {
+                "thumbnail_scene_prompt": "공항 입구 전경",
+                "panels": [
+                    {
+                        "panel_no": 1,
+                        "location": "입국 심사 줄",
+                        "scene_prompt": "콜라가 은색 캐리어를 손에 끌고 서 있다",
+                        "key_props": ["은색 캐리어"],
+                        "carryover_props": [],
+                        "speaker_dialogues": [],
+                    },
+                    {
+                        "panel_no": 2,
+                        "location": "보안 검색대",
+                        "scene_prompt": "은색 캐리어가 벨트 위에 지나가고 둘이 바라본다",
+                        "key_props": ["은색 캐리어"],
+                        "carryover_props": ["은색 캐리어"],
+                        "speaker_dialogues": [],
+                    },
+                ],
+            },
+        )
+
+        assert review["has_issues"] is True
+        assert any("은색 캐리어" in issue for issue in review["issues"])
 
 
 class TestCharacterCompositionGate:
@@ -722,7 +1045,7 @@ class TestCharacterCompositionGate:
         assert "이전 컷 연속 소품 정보가 포함되어 있다면" in full_prompt
         assert "콜라가 제로와 비슷한 크기이거나 더 작아 보이면 오류" in full_prompt
         assert "썸네일부터 패널 6까지 모든 컷에 동일하게 적용" in full_prompt
-        assert "대략 10~15% 범위를 크게 벗어나면 오류" in full_prompt
+        assert "목표는 약 12%이며 허용 범위는 8~15%" in full_prompt
         assert "사족보행, 앞발 체중 지지" in full_prompt
         assert "사람이 올라서면 안 되는 표면" in full_prompt
         assert '"unsafe_surface_pose_detected"(bool)' in full_prompt
@@ -801,8 +1124,8 @@ class TestBackgroundTextGate:
         full_prompt = f"{captured['system_instruction']}\n{captured['prompt']}"
         assert "correct 필드는 긴 설명문이 아니라" in full_prompt
         assert "래스터화된 글리프" in full_prompt
-        assert "'INFO', 'Gate A12', 'On Time'" in full_prompt
-        assert "'DOCUMENT', 'NAME', 'ID'" in full_prompt
+        assert "'INFO', 'FLIGHTS', 'EXIT', 'TICKET'" in full_prompt
+        assert "'PASSPORT' 또는 'DOCUMENT'" in full_prompt
         assert "'STAMP' 같은 짧은 라벨" in full_prompt
         assert "icons only, blank bars only, one short label" in full_prompt
 
@@ -1012,10 +1335,7 @@ def _make_dummy_settings(**overrides) -> WebtoonSettings:
         "google_oauth_client_secret_file": Path("/tmp/fake-secret.json"),
         "google_oauth_token_file": Path("/tmp/fake-token.json"),
         "google_drive_root_folder_id": "fake-folder-id",
-        "google_sheets_spreadsheet_id": "fake-sheet-id",
         "gemini_api_key": "fake-image-key",
-        "instagram_access_token": "fake-token",
-        "instagram_business_account_id": "fake-account-id",
         "approval_default_user": "tester",
     }
     defaults.update(overrides)

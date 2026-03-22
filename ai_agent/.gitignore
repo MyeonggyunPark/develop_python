@@ -43,3 +43,4 @@ node_modules/
 platform/app/data/*.json
 agents/webtoon/secrets/
 agents/webtoon/docs/secrets/
+SESSION_SUMMARY.md
