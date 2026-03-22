@@ -83,6 +83,95 @@ _MULTI_LOCATION_SCOPE_ALIASES = {
 }
 DEFAULT_PUBLIC_EPISODE_FALLBACK = "독일 생활 에피소드"
 
+CREATIVE_BRIEF_HUMOR_BLOCK = (
+    "## 웃음 설계 규칙\n"
+    "- 이 프로젝트는 생활형 개그 웹툰이다. 각 에피소드는 정보 전달보다 먼저 '웃길 만한 상황'이 있어야 한다.\n"
+    "- 단순한 절차 설명이나 평이한 관찰문만 늘어놓지 말고, 콜라와 제로의 성격 차이에서 나오는 코미디를 설계하세요.\n"
+    "- 웃음은 반드시 이번 주제의 실제 상황, 절차, 공간, 소품 안에서 만들어야 한다. 주제와 무관한 뜬금없는 농담이나 별도 개그 컷을 붙이지 마세요.\n"
+    "- 기본 코미디 축은 콜라의 과한 자신감/허세/성급한 낙관과 제로의 예민함/걱정/현실 감각의 대비다.\n"
+    "- 패널마다 최소 하나의 웃음 장치를 의식적으로 넣으세요: 과장된 자신감, 타이밍 어긋남, 오해, 민망함, 예상 밖의 반전, 일상적 절차의 과한 드라마화 중 하나.\n"
+    "- 주제의 핵심 소품과 표지판, 규칙, 절차가 setup 또는 punchline으로 다시 쓰이게 하세요. 예를 들어 여권, 심사대, 대기줄, 가격표, 안내판 같은 실제 장면 요소가 웃음 장치로 연결되어야 합니다.\n"
+    "- 1컷부터 6컷까지 웃음의 강약이 올라가야 한다. 중간 컷은 문제와 당황이 커지고, 5~6컷에서는 해소와 한 방이 있어야 한다.\n"
+    "- 마지막 컷은 단순 정리 멘트가 아니라 '아 그래서 웃기다'는 payoff가 있어야 한다. 반전, 허세 붕괴, 엉뚱한 결론, 역할 역전 중 하나를 넣으세요.\n"
+    "- dialogue_lines는 장면을 평범하게 설명하는 문장보다 캐릭터다운 반응과 핀잔, 오해, 허세, 한숨, 빈정거림이 드러나야 한다.\n"
+    "- 콜라 대사는 자신만만하거나 큰소리치다가도 허점이 드러나는 쪽이 좋고, 제로 대사는 불안하거나 현실적인 태클을 거는 쪽이 좋다.\n"
+    "- 같은 뜻을 평범하게 말하지 말고, 말맛이 살아 있게 쓰세요. 예: '문제 없겠지?'보다 '설마 여기서 막히겠어?' 같은 식의 캐릭터성 있는 표현을 우선하세요.\n"
+    "- 대사만 재밌고 그림은 평범하면 안 된다. scene_prompt에서도 표정, 포즈, 거리감, 소품 배치가 같이 웃기게 읽혀야 한다.\n"
+    "- scene_prompt에도 개그가 읽혀야 한다. 표정, 몸짓, 소품 사용, 거리감이 단순 절차 묘사가 아니라 당황/허세/허무함을 시각적으로 드러내야 한다.\n"
+)
+
+CREATIVE_BRIEF_HUMOR_REVIEW_BLOCK = (
+    "- 대사가 평범한 설명문처럼만 흘러가고 캐릭터 간 티키타카나 개그 톤이 없으면 실패입니다.\n"
+    "- 1~6컷 중 웃음이 커지는 지점이나 payoff가 없고, 그냥 절차를 순서대로 밟는 설명 만화처럼 보이면 실패입니다.\n"
+    "- 콜라의 허세/성급함과 제로의 예민함/현실 태클 대비가 전혀 드러나지 않으면 실패입니다.\n"
+    "- 마지막 컷이 단순 요약이나 교훈 문장만 있고, 웃음 포인트나 반전이 없으면 실패입니다.\n"
+    "- 웃음이 주제 바깥의 뜬금없는 농담에 기대고, 정작 이번 주제의 공간·소품·절차와 연결되지 않으면 실패입니다.\n"
+    "- 패널의 소품이나 표지판, 규칙, 절차가 setup/payoff로 재활용되지 않고 배경 장식처럼만 남아 있으면 실패입니다.\n"
+)
+
+COMPACT_CREATIVE_BRIEF_SYSTEM_INSTRUCTION = (
+    "당신은 생활형 에피소드 웹툰 기획자이자 비주얼 디렉터입니다.\n"
+    "주어진 주제로 6컷 웹툰용 기획안을 JSON 객체 하나로만 반환하세요.\n"
+    "JSON 앞뒤로 설명, 코드펜스, 인사말, 주석을 절대 붙이지 마세요.\n"
+    "필수 필드: title, thumbnail_subtitle, episode_scope, subtitle_scope, scope_summary, "
+    "image_prompt, thumbnail_scene_prompt, caption, hashtags, character_notes, "
+    "outfit_plan, prop_registry, thumbnail_direction, panels.\n\n"
+    "## 캐릭터 및 의상\n"
+    "콜라(왼쪽, 남자): 검은 단색 털, 노란 눈, 자신감 있고 허세. 제로보다 10~15% 크게.\n"
+    "제로(오른쪽, 여자): 회색+검은 줄무늬, 갈색 눈, 분홍 귀, 조심스럽고 걱정 많음.\n"
+    "두 캐릭터는 항상 직립 이족보행이고, 앞발을 손처럼 사용한다.\n"
+    "참조 이미지는 옷 없는 자연 털 상태이지만, 생성 이미지에서는 주제에 맞는 의상을 입힌다.\n"
+    "outfit_plan: 콜라(남자)와 제로(여자) 각각의 의상을 성별에 맞게 영어로 구체적으로 설계. 색상+소재+디테일을 명확히 적어야 이미지 모델이 매 장면마다 동일하게 그릴 수 있음.\n"
+    "  예시: 'solid navy zip-up hoodie with white zipper pull' (O), 'navy hoodie' (X — 너무 모호함).\n"
+    "  각 아이템은 primary color + material/texture + 1 distinguishing detail을 반드시 포함.\n"
+    "  7슬라이드 전체 동일. 절대 패널마다 다른 옷 금지.\n"
+    '  형식: {"kolla": {"top": "...", "bottom": "..."}, "zero": {"top": "...", "bottom": "..."}}\n\n'
+    "## 소품 레지스트리\n"
+    "prop_registry: 에피소드 전체에서 반복되는 핵심 소품의 이름과 외형을 영어로 등록.\n"
+    '  형식: {"prop_id": "English description of appearance"}\n'
+    "등록된 소품은 등장하는 모든 패널에서 동일한 외형으로 유지.\n\n"
+    "## 썸네일 비주얼 디렉션\n"
+    "thumbnail_direction: 이미지 생성 모델이 바로 이해할 구체적 장면 지시를 영어로 작성.\n"
+    '  형식: {"shot": "...", "scene": "...", "background": "...", "composition": "..."}\n'
+    "shot: 카메라 앵글/거리 (예: wide establishing, slightly high angle)\n"
+    "scene: 콜라와 제로가 정확히 무엇을 하고 있는지 (위치, 포즈, 손동작, 표정)\n"
+    "background: 배경 설명 (텍스트 없이 아이콘/색 막대만)\n"
+    "composition: 캐릭터 배치 (예: Characters in lower 60%, upper 40% clean for title)\n\n"
+    "## 패널 비주얼 디렉션\n"
+    "각 panel에 direction 필드를 추가. thumbnail_direction과 같은 형식.\n"
+    '  형식: {"shot": "...", "scene": "...", "background": "...", "composition": "..."}\n'
+    "홀수 패널: 캐릭터 하단 중앙, 상단 좌우 말풍선 공간.\n"
+    "짝수 패널: 캐릭터 상단~중앙, 하단 좌우 말풍선 공간.\n\n"
+    "## scene_prompt 규칙\n"
+    "scene_prompt는 영문으로 짧게 작성. 이미지에 말풍선/대사/캡션 넣지 말 것.\n"
+    "배경에 읽을 수 있는 텍스트를 절대 넣지 말 것. 간판, 화면, 안내판은 아이콘/색 막대로만.\n"
+    "speaker_dialogues: 정확히 2개 항목 (kolla, zero). 각 1~2줄, 38자 이하. 한국어 반말만.\n"
+    "key_props: 현재 컷에서 보여야 하는 핵심 소품. carryover_props: 이전 컷에서 이어지는 소품.\n"
+    "carryover_props가 있으면 scene_prompt에도 직접 다시 명시.\n"
+    "썸네일은 본문 패널의 복사본이 아니라 주제를 포괄하는 대표 배경 장면. 본문 패널과 배경이 겹치면 안 됨.\n"
+    "같은 장소 연속 최대 2컷. 마지막 컷은 웃음 있는 payoff로 마무리.\n"
+    "## 배경 중복 금지 (CRITICAL)\n"
+    "썸네일 + 본문 6패널 = 총 7개의 배경이 모두 시각적으로 달라야 함.\n"
+    "각 패널의 direction.background에 고유한 배경을 영어로 구체적으로 적을 것.\n"
+    "같은 건물/장소라도 카메라 위치, 보이는 구조물, 색조가 완전히 달라야 함.\n"
+    "기승전결 구조: 패널 1-2 도입, 패널 3-4 전개/갈등, 패널 5-6 해결/마무리.\n"
+    "배경 체크리스트: 7개 background 설명을 나열했을 때 서로 겹치는 키워드가 2개 이상이면 재설계.\n"
+    "title, caption, hashtags, dialogue_lines에서 '고양이'라는 단어 사용 금지.\n"
+)
+
+DEFAULT_CHARACTER_NOTES = (
+    "콜라는 남자이며 검은 단색 털과 노란 눈을 가진 왼쪽 캐릭터이고, "
+    "제로는 여자이며 밝은 회색 바탕에 짙은 줄무늬와 갈색 눈을 가진 오른쪽 캐릭터다. "
+    "참조 이미지는 자연 털 상태이지만, 생성 이미지에서는 주제에 맞는 의상을 입힌다."
+)
+
+DEFAULT_IMAGE_PROMPT = (
+    "Korean digital webtoon style, bold clean outlines, vibrant colors, "
+    "expressive exaggerated facial expressions, dynamic poses, "
+    "anthropomorphic cats walking upright on two legs using front paws as hands, "
+    "manga-style emotion effects, detailed background"
+)
+
 
 def _split_prop_candidates(raw_value: Any) -> list[str]:
     if raw_value is None:
@@ -128,15 +217,325 @@ def _normalize_panel_props(raw_props: Any, *, fallback: list[str] | None = None)
     return _merge_prop_lists(fallback or [])
 
 
+def _scene_mentions_prop(scene_prompt: str, prop: str) -> bool:
+    scene = str(scene_prompt).casefold()
+    candidate = str(prop).strip().casefold()
+    if not scene or not candidate:
+        return False
+    return candidate in scene
+
+
+def _scene_prop_state_flags(scene_prompt: str) -> set[str]:
+    text = str(scene_prompt).casefold()
+    if not text:
+        return set()
+    flag_groups = {
+        "handheld": (
+            " 들고",
+            " 쥐고",
+            " 손에",
+            " 앞발에",
+            " 팔에",
+            " 끌고",
+            " 메고",
+            " hold ",
+            " holding",
+            " held ",
+            " carry ",
+            " carrying",
+            " drag ",
+            " dragging",
+            " in paw",
+            " in hand",
+            " under arm",
+            " tucked under",
+        ),
+        "surface": (
+            " 올려",
+            " 올려놓",
+            " 내려놓",
+            " 놓인",
+            " 놓여",
+            " 펼쳐 놓",
+            " 벨트 위",
+            " 트레이 위",
+            " 카운터 위",
+            " 책상 위",
+            " 탁자 위",
+            " 위에 지나가",
+            " 위에 놓",
+            " placed on",
+            " resting on",
+            " set on",
+            " laid on",
+            " lying on",
+            " on the counter",
+            " on the desk",
+            " on the table",
+            " on a tray",
+            " in a tray",
+            " on the belt",
+            " on the conveyor",
+            " on the carousel",
+            " inside the bin",
+        ),
+        "transfer": (
+            " 건네",
+            " 제출",
+            " 내밀",
+            " 맡기",
+            " 올려놓",
+            " 내려놓",
+            " 꺼내",
+            " 넣는",
+            " 집어",
+            " 받아",
+            " 건네받",
+            " pass ",
+            " passing",
+            " hand over",
+            " handoff",
+            " hand-off",
+            " submit",
+            " submitted",
+            " place ",
+            " placing",
+            " put ",
+            " putting",
+            " set down",
+            " pick up",
+            " picking up",
+            " take out",
+            " taking out",
+            " drop off",
+            " dropped off",
+        ),
+    }
+    flags: set[str] = set()
+    for flag, markers in flag_groups.items():
+        if any(marker in text for marker in markers):
+            flags.add(flag)
+    return flags
+
+
+def _ensure_scene_prompt_mentions_props(scene_prompt: str, props: list[str], *, prefix: str) -> str:
+    cleaned = str(scene_prompt).strip()
+    missing = [prop for prop in props if prop and not _scene_mentions_prop(cleaned, prop)]
+    if not missing:
+        return cleaned
+    suffix = f"{prefix}: {', '.join(missing)}."
+    if not cleaned:
+        return suffix
+    if cleaned.endswith((".", "!", "?")):
+        return f"{cleaned} {suffix}"
+    return f"{cleaned}. {suffix}"
+
+
+def _supplement_brief_review(payload: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    panels = payload.get("panels", [])
+    consecutive_same_location = 1
+    previous_location = ""
+    previous_panel: dict[str, Any] | None = None
+    for index, panel in enumerate(panels, start=1):
+        location = str(panel.get("location", "")).strip()
+        scene_prompt = str(panel.get("scene_prompt", "")).strip()
+        carryover_props = _normalize_panel_props(panel.get("carryover_props", []))
+        key_props = _normalize_panel_props(panel.get("key_props", []))
+        for line in flatten_speaker_dialogues(normalize_speaker_dialogues(panel)):
+            if len(line) > 38:
+                issues.append(f"패널 {index} 대사가 너무 깁니다 ({len(line)}자): {line}")
+        missing_from_key_props = [prop for prop in carryover_props if prop.casefold() not in {item.casefold() for item in key_props}]
+        if missing_from_key_props:
+            issues.append(f"패널 {index} carryover_props가 key_props에 다시 포함되지 않았습니다: {', '.join(missing_from_key_props)}")
+        missing_from_scene = [prop for prop in carryover_props if not _scene_mentions_prop(scene_prompt, prop)]
+        if missing_from_scene:
+            issues.append(f"패널 {index} scene_prompt에 carryover_props가 직접 언급되지 않았습니다: {', '.join(missing_from_scene)}")
+        if location and location == previous_location:
+            consecutive_same_location += 1
+        else:
+            consecutive_same_location = 1
+        if consecutive_same_location >= 3 and location:
+            issues.append(f"같은 장소 '{location}'가 3컷 이상 연속 반복되었습니다.")
+        previous_location = location
+        if previous_panel and carryover_props:
+            previous_scene_prompt = str(previous_panel.get("scene_prompt", "")).strip()
+            previous_flags = _scene_prop_state_flags(previous_scene_prompt)
+            current_flags = _scene_prop_state_flags(scene_prompt)
+            changed_surface_state = (
+                ("handheld" in previous_flags and "surface" in current_flags)
+                or ("surface" in previous_flags and "handheld" in current_flags)
+            )
+            for prop in carryover_props:
+                if changed_surface_state and "transfer" not in current_flags:
+                    issues.append(
+                        f"패널 {index} 연속 소품 '{prop}'의 상태가 직전 컷과 갑자기 바뀝니다. "
+                        "같은 물건이면 건네기/올려놓기/집어들기 같은 전이 행동을 scene_prompt에 직접 적으세요."
+                    )
+        previous_panel = panel
+    # Background uniqueness check across all 7 images
+    all_backgrounds: list[tuple[str, str]] = []  # (label, background text)
+    thumb_dir = payload.get("thumbnail_direction", {})
+    if isinstance(thumb_dir, dict):
+        thumb_bg = str(thumb_dir.get("background", "")).strip().lower()
+        if thumb_bg:
+            all_backgrounds.append(("썸네일", thumb_bg))
+    for panel in panels:
+        panel_no = panel.get("panel_no", "?")
+        direction = panel.get("direction", {})
+        if isinstance(direction, dict):
+            bg = str(direction.get("background", "")).strip().lower()
+            if bg:
+                all_backgrounds.append((f"패널 {panel_no}", bg))
+    # Check pairwise keyword overlap
+    for i in range(len(all_backgrounds)):
+        for j in range(i + 1, len(all_backgrounds)):
+            label_a, bg_a = all_backgrounds[i]
+            label_b, bg_b = all_backgrounds[j]
+            words_a = {w for w in bg_a.split() if len(w) > 3}
+            words_b = {w for w in bg_b.split() if len(w) > 3}
+            overlap = words_a & words_b
+            if len(overlap) >= 3:
+                issues.append(
+                    f"{label_a}과(와) {label_b}의 배경이 유사합니다 (겹치는 키워드: {', '.join(sorted(overlap))}). "
+                    "각 이미지의 배경은 시각적으로 완전히 달라야 합니다."
+                )
+    return issues
+
+
+def _build_default_speaker_dialogues(panel_no: int, story_role: str) -> list[dict[str, Any]]:
+    normalized_role = str(story_role).strip()
+    line_map: dict[int, tuple[str, str]] = {
+        1: ("드디어 왔네!", "벌써 긴장되는데..."),
+        2: ("이 정도는 쉽지!", "제발 실수만 하지 마."),
+        3: ("어, 왜 이러지?", "그러게 내가 말했잖아."),
+        4: ("잠깐만, 곧 풀려!", "안 풀리면 큰일이야."),
+        5: ("봐, 결국 됐지!", "심장 떨어지는 줄 알았어."),
+        6: ("이 정도면 완벽하지!", "완벽은 무슨, 진땀만 뺐어."),
+    }
+    role_map: dict[str, tuple[str, str]] = {
+        "기": ("시작부터 느낌 좋지!", "좋긴 한데 좀 불안해..."),
+        "승": ("이제 바로 해치운다!", "천천히 좀 하자."),
+        "전": ("어, 이건 예상 밖인데?", "내가 불안하댔잖아."),
+        "결": ("결국 내가 해냈지!", "해낸 건 맞는데 너무 아슬아슬했어."),
+    }
+    kolla_line, zero_line = line_map.get(panel_no, ("가볍게 가보자!", "제발 무사히 끝나자."))
+    if normalized_role in role_map:
+        kolla_line, zero_line = role_map[normalized_role]
+    return [
+        {"speaker": "kolla", "dialogue_lines": [kolla_line]},
+        {"speaker": "zero", "dialogue_lines": [zero_line]},
+    ]
+
+
+def _location_scope_key(location: str) -> str:
+    text = re.sub(r"\s+", " ", str(location).strip())
+    if not text:
+        return ""
+    primary = re.split(r"[,/|>→-]+", text, maxsplit=1)[0].strip()
+    return primary or text
+
+
+def _ensure_fixed_character_appearance(scene_prompt: str) -> str:
+    cleaned = str(scene_prompt).strip()
+    replacements = (
+        (r"\bred cola bottle\b", "black-furred character Kolla"),
+        (r"\bcola bottle\b", "black-furred character Kolla"),
+        (r"\bwhite zero-calorie cola bottle\b", "light gray tabby character Zero"),
+        (r"\bzero-calorie cola bottle\b", "light gray tabby character Zero"),
+        (r"\bblue, bipedal blob character\b", "light gray tabby character Zero"),
+        (r"\bpink, bipedal blob character\b", "black-furred character Kolla"),
+        (r"\bblob character\b", "anthropomorphic character"),
+    )
+    for pattern, replacement in replacements:
+        cleaned = re.sub(pattern, replacement, cleaned, flags=re.IGNORECASE)
+    appearance_lines = [
+        "Kolla is a black-furred character with yellow eyes on the left.",
+        "Zero is a light gray tabby character with dark stripes and brown eyes on the right.",
+    ]
+    for line in appearance_lines:
+        if line.casefold() not in cleaned.casefold():
+            cleaned = f"{cleaned} {line}".strip()
+    return cleaned
+
+
+def _compact_image_prompt_for_model(prompt: str, model_name: str) -> str:
+    """Reduce prompt length for gemini-2.5 image models while preserving ALL directives.
+
+    Strategy: keep every bullet-point directive line (starts with ``-``) and short
+    section-header lines; deduplicate exact duplicates; drop only long narrative
+    paragraphs that do not begin with ``-``.  This ensures critical constraints
+    (eye colour, size ratio, background-text ban, bipedal posture, etc.) are NEVER
+    silently removed.
+    """
+    cleaned = str(prompt).strip()
+    if not cleaned or not model_name.startswith("gemini-2.5") or len(cleaned) < 5000:
+        return cleaned
+
+    kept: list[str] = []
+    seen: set[str] = set()
+    for line in cleaned.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped in seen:
+            continue
+        seen.add(stripped)
+        # Always keep directive lines (bullet points) and short header/label lines.
+        # Drop only long narrative paragraphs that are not directives.
+        if stripped.startswith("-") or len(stripped) <= 120:
+            kept.append(stripped)
+        # Long non-bullet lines (verbose narrative explanations) are omitted.
+
+    if len(kept) < 8:
+        return cleaned
+    compacted = "\n".join(kept)
+    if len(compacted) >= len(cleaned) * 0.92:
+        # Negligible savings — return original to avoid any distortion.
+        return cleaned
+    logger.warning(
+        "gemini-2.5 이미지 모델용 프롬프트를 축약합니다. (원본 %d자 -> 축약 %d자)",
+        len(cleaned),
+        len(compacted),
+    )
+    return compacted
+
+
+def _repair_json_text(text: str) -> str:
+    """Apply heuristic repairs to malformed JSON from LLM responses."""
+    # Remove trailing commas before closing braces/brackets.
+    text = re.sub(r",\s*([}\]])", r"\1", text)
+    # Replace literal tab characters inside strings with spaces.
+    text = text.replace("\t", " ")
+    return text
+
+
 def _extract_json_object(text: str) -> Any:
     cleaned = text.strip()
     if cleaned.startswith("```"):
         lines = [line for line in cleaned.splitlines() if not line.startswith("```")]
         cleaned = "\n".join(lines).strip()
+    start_candidates = [index for index in (cleaned.find("{"), cleaned.find("[")) if index != -1]
+    if start_candidates:
+        cleaned = cleaned[min(start_candidates):].lstrip()
+
+    # Stage 1: standard parse.
     try:
-        return json.loads(cleaned)
+        decoder = json.JSONDecoder()
+        parsed, _end = decoder.raw_decode(cleaned)
+        return parsed
+    except json.JSONDecodeError:
+        pass
+
+    # Stage 2: apply heuristic repairs then retry.
+    repaired = _repair_json_text(cleaned)
+    try:
+        decoder = json.JSONDecoder()
+        parsed, _end = decoder.raw_decode(repaired)
+        logger.debug("JSON 복구 성공 (휴리스틱 수정 후 파싱 완료)")
+        return parsed
     except json.JSONDecodeError as exc:
-        logger.warning("JSON 파싱 실패, 원본 텍스트 앞 200자: %s", cleaned[:200])
+        logger.warning("JSON 파싱 실패 (복구 시도 후), 원본 텍스트 앞 200자: %s", cleaned[:200])
         raise ValueError(f"LLM 응답에서 유효한 JSON을 추출할 수 없습니다: {exc}") from exc
 
 
@@ -457,13 +856,19 @@ def _derive_episode_scope_from_panels(panels: list[dict[str, Any]]) -> str:
         return SINGLE_LOCATION_SCOPE
 
     unique_locations: list[str] = []
+    unique_scope_keys: list[str] = []
     for location in locations:
         if location not in unique_locations:
             unique_locations.append(location)
+        scope_key = _location_scope_key(location)
+        if scope_key and scope_key not in unique_scope_keys:
+            unique_scope_keys.append(scope_key)
 
     location_transitions = sum(
         1 for previous, current in zip(locations, locations[1:]) if previous and current and previous != current
     )
+    if len(unique_scope_keys) <= 1:
+        return SINGLE_LOCATION_SCOPE
     if len(unique_locations) >= 3 or location_transitions >= 2:
         return MULTI_LOCATION_JOURNEY_SCOPE
     return SINGLE_LOCATION_SCOPE
@@ -494,14 +899,13 @@ def _normalize_episode_scope(value: Any, *, panels: list[dict[str, Any]] | None 
         "multiple_locations": MULTI_LOCATION_JOURNEY_SCOPE,
         "trip": MULTI_LOCATION_JOURNEY_SCOPE,
     }
+    derived_scope = _derive_episode_scope_from_panels(panels or [])
     if normalized in mapping:
-        return mapping[normalized]
-    unique_locations = {
-        str(panel.get("location", "")).strip()
-        for panel in (panels or [])
-        if str(panel.get("location", "")).strip()
-    }
-    return MULTI_LOCATION_JOURNEY_SCOPE if len(unique_locations) >= 3 else SINGLE_LOCATION_SCOPE
+        declared_scope = mapping[normalized]
+        if declared_scope == MULTI_LOCATION_JOURNEY_SCOPE and derived_scope == SINGLE_LOCATION_SCOPE:
+            return derived_scope
+        return declared_scope
+    return derived_scope
 
 
 def _normalize_subtitle_scope(value: Any, *, fallback: str) -> str:
@@ -698,18 +1102,30 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
         }
 
     def build_creative_brief(self, topic: str) -> dict[str, Any]:
-        system_instruction = (
+        detailed_system_instruction = (
             "당신은 생활형 에피소드 웹툰 기획자입니다.\n"
             "주어진 주제로 6컷 웹툰용 장면 계획과 인스타그램 캡션을 만듭니다.\n"
-            "응답은 JSON 객체만 반환하세요.\n\n"
+            "응답은 JSON 객체만 반환하세요.\n"
+            "JSON 앞이나 뒤에 설명문, 해설, 마크다운 코드펜스, 예시, 주석, 사과, 확인 문장을 절대 붙이지 마세요.\n"
+            "출력의 첫 글자는 반드시 '{'이고 마지막 글자는 반드시 '}'여야 합니다.\n\n"
             "## 캐릭터 설정 (절대 변경 금지)\n"
-            "- 콜라(검은 캐릭터): 의인화된 캐릭터. 두 발로 서서 걷고, 앞발을 손처럼 사용한다. "
+            "- 콜라(검은 캐릭터, 남자): 의인화된 캐릭터. 두 발로 서서 걷고, 앞발을 손처럼 사용한다. "
             "자신감 있고 허세가 있지만 결국 허당인 성격. 노란 눈, 검은 단색 털.\n"
-            "- 제로(회색 줄무늬 캐릭터): 의인화된 캐릭터. 두 발로 서서 걷고, 앞발을 손처럼 사용한다. "
+            "- 제로(회색 줄무늬 캐릭터, 여자): 의인화된 캐릭터. 두 발로 서서 걷고, 앞발을 손처럼 사용한다. "
             "조심스럽고 걱정이 많지만 실행력이 있는 성격. 갈색 눈, 회색 바탕에 검은 줄무늬, 분홍 귀.\n"
             "- 두 캐릭터 모두 사람처럼 이족보행하며, 물건을 잡고, 기계를 조작하고, 제스처를 취한다.\n"
             "- 캐릭터 체형은 유지하되 행동과 포즈는 완전히 사람처럼 표현한다.\n"
-            "- 캐릭터는 절대 옷을 입지 않는다. 항상 자연스러운 털 그대로의 모습이다.\n"
+            "- 참조 이미지는 자연 털 상태이지만, 생성 이미지에서는 주제에 맞는 의상을 입힌다.\n"
+            "- outfit_plan 필드에 콜라와 제로 각각의 의상을 영어로 구체적으로 설계하세요.\n"
+            "- 각 아이템은 반드시 primary color + material/texture + 1 distinguishing detail을 포함해야 합니다.\n"
+            "  좋은 예: 'solid navy zip-up hoodie with white zipper pull and ribbed cuffs'\n"
+            "  나쁜 예: 'navy hoodie' (색상만 있고 소재/디테일 없음 — 이미지 모델이 매번 다르게 해석함)\n"
+            '- outfit_plan 형식: {"kolla": {"top": "...", "bottom": "..."}, "zero": {"top": "...", "bottom": "..."}}\n'
+            "- 콜라는 남자이므로 남성용 의상, 제로는 여자이므로 여성용 의상으로 설계하세요.\n"
+            "- 의상은 주제와 장소에 자연스러운 것으로 선택하세요. 과장되거나 복잡한 의상은 금지.\n"
+            "- 7슬라이드 전체 동일한 의상. 절대 패널마다 다른 옷 금지.\n"
+            "- prop_registry 필드에 에피소드 전체에서 반복 사용되는 핵심 소품의 영어 설명을 등록하세요.\n"
+            '- prop_registry 형식: {"prop_id": "short English description"}\n'
             "- 콜라는 항상 화면 왼쪽, 제로는 항상 화면 오른쪽에 배치한다.\n"
             "- 콜라의 전신 크기는 제로보다 항상 약간 더 크게 보이게 유지한다. 대략 10~15% 크게 표현한다.\n"
             "- 이 크기 서열은 썸네일부터 패널 6까지 모든 이미지에서 예외 없이 동일해야 합니다. 어느 컷에서도 제로가 더 크거나 같게 읽히면 실패입니다.\n"
@@ -720,7 +1136,7 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "## 아트 스타일\n"
             "- 한국식 디지털 웹툰 스타일 (네이버/카카오 웹툰 느낌)\n"
             "- 굵고 깔끔한 외곽선, 생동감 있는 색상, 과장된 표정과 역동적 포즈\n"
-            "- 만화적 이펙트 사용 (놀람 표시, 땀방울, 분노 마크, 반짝임 등)\n"
+            "- 만화적 이펙트는 감정 전달에 필요한 범위에서만 절제해 사용하고, 스티커처럼 분리된 얼굴/기호/컷인은 금지\n"
             "- 배경은 주제와 장면 전개에 맞는 생활 공간을 디테일하게 묘사\n\n"
             "## 썸네일 규칙\n"
             "- title은 썸네일 주제목이다. 4~12자 안팎의 짧고 강한 한 문구로 작성하세요.\n"
@@ -737,10 +1153,18 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- thumbnail_scene_prompt는 모든 panel의 location 및 scene_prompt와 구별되는 별도의 teaser shot이어야 합니다.\n"
             "- 썸네일은 에피소드 전체를 대표하는 예고 컷이어야 하며, 본문 컷 하나를 확대하거나 재연한 이미지여서는 안 됩니다.\n"
             "- 썸네일과 panel 1은 캐릭터 포즈, 시선 방향, 손동작, 소품 배치까지 비슷하면 안 됩니다. 같은 캐리어 배치나 같은 나란히 서기 구도는 피하세요.\n"
+            "- 썸네일은 가능하면 정면 아이레벨보다 넓은 하이앵글 또는 사선 establishing shot으로 설계하세요. panel 1과 같은 정면 응시 구도는 피하세요.\n"
+            "- 이야기 흐름상 꼭 필요한 후면/측후면이 아니면 썸네일에서 두 캐릭터를 뒷모습으로만 두지 마세요. 얼굴과 눈이 읽히는 정면 또는 3/4 시점을 우선하세요.\n"
             "- 본문 1~6컷 어느 곳에서도 썸네일의 배경 구조, 서브로케이션, 카메라 거리, 대표 간판, 대표 소품 배치를 다시 사용하면 안 됩니다. 썸네일 배경이 본문에 재등장하면 실패입니다.\n"
             "- 썸네일과 본문은 구조적 배경 지문도 달라야 합니다. 천장 형태, 중앙 홀 구조, 복도 깊이, 출구 프레임, 카운터 구조, 바닥 패턴, 대표 간판 군집이 본문 어느 컷과 겹치면 실패입니다.\n"
             "- journey형 에피소드라면 썸네일은 특정 패널 장소의 넓은 버전이면 안 됩니다. 전체 여정을 소개하는 별도 출발 장면이나 전환 장면이어야 합니다.\n"
-            "- 표지 상단이나 구석에 추가 캐릭터 실루엣, 뒷모습, 참조용 분신처럼 보이는 장식을 절대 넣지 마세요.\n\n"
+            "- 표지 상단이나 구석에 추가 캐릭터 실루엣, 뒷모습, 참조용 분신처럼 보이는 장식을 절대 넣지 마세요.\n"
+            "- thumbnail_direction 필드에 이미지 생성 모델이 바로 이해할 구체적 장면 지시를 영어로 작성하세요.\n"
+            '- thumbnail_direction 형식: {"shot": "카메라 앵글/거리", "scene": "캐릭터 행동 묘사", "background": "배경 설명", "composition": "배치 규칙"}\n'
+            "- shot: wide/medium/close-up + 앵글 (예: wide establishing, slightly high angle)\n"
+            "- scene: 콜라와 제로가 정확히 무엇을 하고 있는지 (위치, 포즈, 손동작, 표정, 소품)\n"
+            "- background: 배경 설명. 읽을 수 있는 텍스트를 넣지 말고 아이콘/색 막대만.\n"
+            "- composition: Characters in lower 60%, upper 40% clean for title overlay.\n\n"
             "## 범위 일치 규칙\n"
             "- 먼저 이 에피소드가 하나의 좁은 현장/상황 안에서 끝나는 이야기인지, 여러 장소를 거치는 여정형 이야기인지 결정하세요.\n"
             '- episode_scope 필드에는 반드시 "single_location" 또는 "journey" 중 하나만 넣으세요.\n'
@@ -757,6 +1181,7 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- 등장인물은 사람을 대체하는 캐릭터이므로 '고양이'를 직접 언급하면 안 됩니다.\n"
             "- 예: '고양이들의 마트 적응기' (X) → '마트 적응기!' (O)\n"
             "- 예: '고양이 웹툰' (X) → '생활 에피소드' (O)\n\n"
+            f"{CREATIVE_BRIEF_HUMOR_BLOCK}\n"
             "## scene_prompt 작성 규칙\n"
             "- scene_prompt는 이미지 생성 AI에게 전달되는 영문 프롬프트이다.\n"
             "- 반드시 아래 스타일 지시를 scene_prompt 앞에 포함하세요:\n"
@@ -770,15 +1195,27 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- scene_prompt에 'Kolla should appear slightly larger than Zero, about 10 to 15 percent bigger in body scale'를 포함하세요.\n"
             "- 모든 scene_prompt와 thumbnail_scene_prompt에서 'Kolla must remain larger than Zero in every shot, with larger head, torso, and full-body silhouette and no perspective exception' 규칙을 유지하세요.\n"
             "- 또한 모든 scene_prompt와 thumbnail_scene_prompt에서 'Keep the Kolla-to-Zero size ratio stable across the whole episode; do not suddenly enlarge Kolla or shrink Zero beyond the same 10 to 15 percent band' 규칙을 유지하세요.\n"
+            "- 상대 크기 차이는 머리 꼭대기 높이, 어깨선, 몸통 폭, 전신 실루엣 기준 모두에서 읽혀야 합니다. 원근 때문에 제로가 더 크게 보이거나, 콜라가 과도하게 커져 성인과 아기처럼 보이면 실패입니다.\n"
+            "- 콜라가 더 크게 보여야 한다는 규칙은 몸집 비율만 의미합니다. 근육질 몸매, 보디빌더형 상체, 과장된 벌크로 키우면 실패입니다.\n"
             "- scene_prompt에 'exactly two recurring cat protagonists only, no extra cat duplicates, no extra heads, no duplicate faces, no sticker portraits, no costume changes; minor background humans are allowed only when the location naturally requires them'를 포함하세요.\n"
             "- scene_prompt에 'strictly upright bipedal posture, upright pelvis and torso, forepaws used as hands only, no weight-bearing forepaws, never on all fours'를 포함하세요.\n"
             "- 썸네일 포함 모든 장면에서 네 발 보행, 앞발 체중 지지, 일반 동물형 달리기, 바닥을 짚는 자세가 한 번이라도 나오면 실패로 간주하세요.\n"
+            "- scene_prompt에 'exactly two forelimbs only, anatomically natural arms and paws, no extra hands, no missing arms, no duplicated limbs'를 포함하세요.\n"
+            "- scene_prompt에 'Character accuracy has priority over background detail; simplify the background first if needed'를 포함하세요.\n"
+            "- scene_prompt 안에 콜라와 제로 각각의 외형 고정 요소(검은 단색+노란 눈 / 밝은 회색+짙은 swirl+갈색 눈)를 직접 다시 적어 참조 이미지 고정을 강화하세요.\n"
+            "- 콜라와 제로의 외형 특징이 서로 섞이면 안 됩니다. 콜라에 회색 줄무늬가 생기거나, 제로의 눈 색이 갈색이 아닌 노란색/호박색으로 바뀌면 실패입니다.\n"
+            "- 참조 이미지는 외형 불변 기준입니다. scene_prompt에 색상, 무늬, 얼굴형, 귀 모양, 꼬리 실루엣을 참조 그대로 유지한다는 뜻을 분명히 적으세요.\n"
+            "- 장면 설명에 left paw/right paw, holding, presenting, pointing 같은 행동 주체가 있으면 그 손 방향과 행동 주체를 정확히 적으세요. 다른 캐릭터에게 행동을 넘기면 안 됩니다.\n"
+            "- 같은 scene_prompt 안에서 누가 어떤 소품을 들고 있는지 단 한 번만 명확하게 적고, 같은 소품이 두 손 또는 두 캐릭터에 동시에 중복 소유된 것처럼 보이게 쓰지 마세요.\n"
+            "- scene_prompt에서 소품 수량을 지정했다면(예: two passports) 그 개수를 그대로 유지하고, 서로 분리된 개별 물건으로 보이게 적으세요. 두 개를 한 권짜리 두꺼운 책자처럼 합쳐 보이게 하면 안 됩니다.\n"
+            "- scene_prompt에서 under his arm / tucked under arm / upside down / one-paw facepalm 같은 구체 행동을 쓰면, 그 자세와 방향이 최종 이미지에서 눈에 띄게 구분되도록 명시하세요.\n"
             "- scene_prompt에 캐릭터가 벨트, 레일, 기계 상판, 운반 장비, 전시대 상단처럼 사람이 올라서면 안 되는 표면 위에 서지 않는다는 뜻을 명시하세요. 이런 물체는 배경 소품이고, 캐릭터는 주변의 정상적인 바닥, 계단, 좌석, 플랫폼 면 위에 있어야 합니다.\n"
             "- 간판, 안내판, 디지털 화면, 메뉴판, 라벨처럼 텍스트가 많은 배경 요소는 글자를 과하게 넣지 마세요. 꼭 필요하면 1~3개의 짧고 정확한 실재 단어만 사용하고, 나머지는 색 막대/아이콘/선으로 단순화하세요.\n"
             "- 철자를 자신 있게 정확히 쓸 수 없는 배경 텍스트는 아예 쓰지 말고, 장면 핵심 라벨 1개만 남기고 나머지는 bars/icons/blank lines로 처리하도록 scene_prompt를 작성하세요.\n"
             "- 장소 종류와 무관하게 텍스트가 많은 배경 요소는 여러 줄 미세문구 대신 큰 라벨 1개 또는 매우 짧은 2단어 라벨만 허용하세요.\n"
             "- 의미 없는 알파벳 덩어리, 모자이크 같은 깨진 텍스트, 읽을 수 없는 과도한 미세 글자를 유도하는 scene_prompt는 작성하지 마세요.\n"
-            "- scene_prompt에 반드시 'The characters do NOT wear any clothing, shoes, or accessories. They have natural fur only.'를 포함하세요.\n"
+            "- scene_prompt에서 의상은 outfit_plan에 정의된 것만 언급하세요. outfit_plan에 없는 액세서리(선글라스, 모자, 보석 등)는 금지.\n"
+            "- background humans가 필요하면 scene_prompt에 'small, distant, blurred background humans only; never larger than the protagonists'를 포함하세요.\n"
             "- scene_prompt에 반드시 'Do NOT draw any speech bubbles, dialogue text, or captions in the image.'를 포함하세요.\n"
             "- 독일어 배경 텍스트가 필요하면 실존 브랜드명만 정확한 철자로 사용하세요.\n\n"
             "## dialogue_lines 규칙\n"
@@ -787,7 +1224,8 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             '- 각 항목 형식: {"speaker": "kolla"|"zero", "dialogue_lines": ["..."]}\n'
             "- 각 캐릭터는 최소 1줄, 최대 2줄만 말하게 하세요.\n"
             "- 전체 대사는 2~4줄 이내여야 합니다.\n"
-            "- 한 줄 길이는 12~20자가 자연스럽고, 꼭 필요할 때만 조금 더 길게.\n"
+            "- 한 줄 길이는 12~20자가 자연스럽고, 가능하면 28자 이내를 목표로 하세요.\n"
+            "- 하드 제한: 어떤 줄도 38자를 넘기지 마세요. 38자를 넘기면 실패입니다.\n"
             "- 독일어는 dialogue_lines에 넣지 마세요.\n"
             "- '고양이'라는 단어를 대사에서도 사용하지 마세요.\n"
             "- 매우 중요: 콜라 대사는 항상 콜라 항목 안에만, 제로 대사는 항상 제로 항목 안에만 넣으세요. 서로 섞지 마세요.\n"
@@ -805,10 +1243,17 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- 6컷(결): 확실한 마무리 — 이야기가 완전히 완결되는 장면. "
             "단순히 여운을 남기는 것이 아니라, 상황이 해결되고 두 캐릭터가 "
             "교훈이나 감상을 주고받으며 에피소드가 깔끔하게 끝나야 합니다.\n\n"
+            "## 배경 중복 금지 (CRITICAL)\n"
+            "- 썸네일 + 본문 6패널 = 총 7개의 배경이 모두 시각적으로 달라야 합니다.\n"
+            "- 각 패널의 direction.background 필드에 고유한 배경을 영어로 구체적으로 적으세요.\n"
+            "- 같은 건물/장소 내라도 보이는 구조물, 색조, 카메라 위치가 완전히 달라야 합니다.\n"
+            "- 7개의 background 설명을 나열했을 때 서로 겹치는 핵심 키워드가 2개 이상이면 재설계하세요.\n"
+            "- 기승전결 배경 구조: 패널 1-2 도입 장소, 패널 3-4 전개/갈등 장소, 패널 5-6 해결/마무리 장소.\n"
+            "- 썸네일 배경은 주제를 포괄하는 대표 공간이며, 본문 6패널의 어느 배경과도 겹치면 안 됩니다.\n\n"
             "## 패널 장면 다양성 규칙\n"
             "- 각 패널에는 story_role과 location 필드를 반드시 넣으세요.\n"
             "- location은 이번 컷의 핵심 배경 장소를 한국어 명사구로 구체적으로 적습니다. 주제에 따라 집, 거리, 마트, 학교, 공공기관, 교통수단, 회사, 관공서 등 실제 공간을 분명히 적으세요.\n"
-            "- 배경이 같은 장소로 유지되는 컷은 최대 2컷까지만 허용합니다.\n"
+            "- 6패널 각각의 location이 모두 다른 장소여야 합니다. 같은 장소 연속 최대 2컷.\n"
             "- 이전 컷과 장소가 바뀌면 scene_prompt와 location에서 배경 변화가 명확히 드러나야 합니다.\n"
             "- 각 scene_prompt에는 장소를 바꿔야 할 때 반드시 새로운 배경 요소를 직접 적으세요.\n"
             "- 각 패널에는 key_props 배열과 carryover_props 배열을 반드시 넣으세요.\n"
@@ -816,27 +1261,59 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- carryover_props는 이전 컷에서 이번 컷까지 같은 물건으로 계속 이어져야 하는 소품의 부분집합입니다. 없으면 빈 배열로 두세요.\n"
             "- 같은 물건이 이어지면 carryover_props에서는 이전 컷과 정확히 같은 이름을 반복해 쓰세요. 동의어 치환이나 포괄어 변경으로 얼버무리지 마세요.\n"
             "- carryover_props에 적은 소품은 반드시 key_props에도 다시 포함하세요.\n"
+            "- carryover_props가 비어 있지 않은 패널은 scene_prompt에도 그 소품 이름을 전부 직접 다시 적으세요. scene_prompt에 빠지면 실패입니다.\n"
+            "- 반복 소품은 이름만 맞추지 말고 같은 물건의 정체성이 유지되도록 계획하세요. 주된 색상, 크기감, 형태, 손에 든 방향, 열림/닫힘 상태가 바뀌지 않게 scene_prompt에도 같이 적으세요.\n"
+            "- 같은 연속 소품의 물리적 상태가 손에 든 상태에서 벨트/트레이/카운터 위 상태로 바뀌거나 그 반대로 바뀌면, 건네기/올려놓기/집어들기 같은 전이 행동을 scene_prompt에 직접 적으세요. 전이 설명 없이 갑자기 상태만 바꾸면 실패입니다.\n"
+            "- 여권, 입국 서류 파일, 캐리어, 탑승권처럼 여러 컷에 걸쳐 반복되는 소품은 패널마다 다른 일반 명사로 바꾸지 말고 같은 이름과 같은 물건 설명을 유지하세요.\n"
+            "- 소품의 실제성도 명시하세요. 펼친 여권이면 열린 페이지와 도장이 보여야 하고, 가리키는 장면이면 어떤 손으로 무엇의 어느 면을 가리키는지 scene_prompt에 적으세요.\n"
+            "- 각 panel의 scene_prompt에는 두 캐릭터가 직립 이족보행을 유지한 채 어떻게 행동하는지 분명히 적으세요. 서류를 찾는 장면이어도 네 발로 엎드리거나 캐리어에 기대지 않는다고 생각하고 서술하세요.\n"
             "- 특정 주제 예시를 하드코딩하지 말고, 그 패널에서 실제로 중요한 소품 이름만 적으세요.\n"
             "- 내용 흐름상 이어지는 핵심 소품(예: 여권, 티켓, 캐리어, 가방, 지도, 휴대폰, 문서철)은 다음 컷에서도 같은 소품으로 유지하세요. 같은 흐름인데 갑자기 다른 물건으로 바꾸면 실패입니다.\n"
             "- 소품이 계속 이어져야 하는 컷이라면 scene_prompt에 그 연속 소품을 다시 직접 적으세요. 종류와 주된 색상, 손에 든 상태가 바뀌면 안 됩니다.\n"
             "- panel 1은 thumbnail_scene_prompt와 같은 장소, 같은 행동 순간, 같은 카메라 구도를 사용하면 안 됩니다.\n"
             "- 모든 panel은 thumbnail_scene_prompt와 배경 장소 또는 사건 시점이 명확히 구별되어야 합니다.\n\n"
             "panels는 정확히 6개여야 합니다.\n"
-            "각 panel에는 panel_no, story_role, location, scene_prompt, key_props, carryover_props, speaker_dialogues를 넣으세요.\n"
+            "각 panel에는 panel_no, story_role, location, scene_prompt, key_props, carryover_props, speaker_dialogues, direction을 넣으세요.\n"
+            "direction은 이미지 생성 모델이 바로 이해할 구체적 장면 지시를 영어로 작성합니다.\n"
+            '각 panel의 direction 형식: {"shot": "...", "scene": "...", "background": "...", "composition": "..."}\n'
+            "홀수 패널(1,3,5): 캐릭터 하단 중앙, 상단 좌우 말풍선 공간 확보.\n"
+            "짝수 패널(2,4,6): 캐릭터 상단~중앙, 하단 좌우 말풍선 공간 확보.\n"
             "해시태그는 문자열 배열로 작성하되, '고양이'라는 단어를 포함하지 마세요.\n"
-            '필드: "title", "thumbnail_subtitle", "episode_scope", "subtitle_scope", "scope_summary", "image_prompt", "thumbnail_scene_prompt", "caption", "hashtags", "character_notes", "panels"\n'
+            '필드: "title", "thumbnail_subtitle", "episode_scope", "subtitle_scope", "scope_summary", '
+            '"image_prompt", "thumbnail_scene_prompt", "caption", "hashtags", "character_notes", '
+            '"outfit_plan", "prop_registry", "thumbnail_direction", "panels"\n'
         )
-        payload = self._normalize_brief_payload(
-            topic,
-            _extract_json_object(
+        use_compact_prompt = self.settings.llm_model.startswith("gemini-2.5")
+        system_instruction = (
+            COMPACT_CREATIVE_BRIEF_SYSTEM_INSTRUCTION if use_compact_prompt else detailed_system_instruction
+        )
+        primary_thinking_level = "medium" if use_compact_prompt else "high"
+        if use_compact_prompt:
+            logger.warning(
+                "gemini-2.5 계열 모델에서는 creative brief 생성 안정성을 위해 축약 프롬프트를 사용합니다. (model=%s)",
+                self.settings.llm_model,
+            )
+        try:
+            raw_payload = _extract_json_object(
                 self._generate_text(
                     f"주제: {topic}",
-                    thinking_level="high",
+                    thinking_level=primary_thinking_level,
                     system_instruction=system_instruction,
-                    cache_key="creative-brief-v2",
+                    cache_key=None,
                 )
-            ),
-        )
+            )
+        except Exception as exc:
+            logger.warning("스토리 기획 1차 생성 실패, 축약 프롬프트로 재시도합니다: %s", exc)
+            raw_payload = _extract_json_object(
+                self._generate_text(
+                    f"주제: {topic}",
+                    max_retries=2,
+                    thinking_level="medium",
+                    system_instruction=COMPACT_CREATIVE_BRIEF_SYSTEM_INSTRUCTION,
+                    cache_key=None,
+                )
+            )
+        payload = self._normalize_brief_payload(topic, raw_payload)
         review: dict[str, Any] = {"has_issues": False, "issues": [], "rewrite_instruction": ""}
         for attempt in range(1, 3):
             review = self._review_creative_brief(topic, payload)
@@ -850,6 +1327,53 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
                 break
         payload["story_review"] = review
         return payload
+
+    def rewrite_creative_brief_for_targets(
+        self,
+        topic: str,
+        payload: dict[str, Any],
+        *,
+        hard_blockers: list[str],
+        targets: dict[str, Any],
+    ) -> dict[str, Any]:
+        target_panels = [int(number) for number in targets.get("panel_numbers", []) if int(number) > 0]
+        target_summary = (
+            f"thumbnail={bool(targets.get('thumbnail'))}, panels={target_panels}"
+            if target_panels or targets.get("thumbnail")
+            else "thumbnail=False, panels=[]"
+        )
+        system_instruction = (
+            "최종 품질 검수에서 실패한 웹툰 기획안을 부분 재작성합니다.\n"
+            "응답은 JSON 객체만 반환하세요.\n"
+            "반드시 기존 스키마를 유지하세요: title, thumbnail_subtitle, episode_scope, subtitle_scope, scope_summary, image_prompt, thumbnail_scene_prompt, caption, hashtags, character_notes, panels.\n"
+            "panels는 정확히 6개이며, 각 panel에는 panel_no, story_role, location, scene_prompt, key_props, carryover_props, speaker_dialogues가 필요합니다.\n"
+            "중요: 타깃으로 지정되지 않은 panel은 기존 장면 의도와 대사를 유지하세요. 오직 지정된 썸네일/패널만 구조적으로 다시 설계하세요.\n"
+            "중요: 지정된 패널은 이전 실패 원인을 피하도록 location, scene_prompt, key_props, carryover_props를 다시 써야 합니다.\n"
+            "중요: 패널 간 carryover_props 이름은 정확히 유지하고, scene_prompt에도 다시 명시하세요.\n"
+            "중요: carryover_props가 있는 패널은 scene_prompt에 그 소품 이름을 모두 직접 반복해야 합니다. 하나라도 빠지면 안 됩니다.\n"
+            "중요: 어떤 대사 줄도 38자를 넘기지 마세요. 길면 더 짧고 강한 반말로 다시 써야 합니다.\n"
+            "중요: 장면과 프롬프트 불일치, 배경 재사용, journey 전개 붕괴, 결말 부재, 썸네일-본문 중복을 우선 해결하세요.\n"
+            "중요: 콜라는 항상 제로보다 10~15% 크게 읽혀야 하며, 두 캐릭터 모두 완전한 이족보행이어야 합니다.\n"
+            "중요: 의미 없는 배경 미세 텍스트를 유도하지 마세요.\n"
+            "중요: 특정 주제 예시를 하드코딩하지 말고 현재 topic과 기존 기획안 범위를 유지하세요.\n"
+            "중요: 썸네일이 타깃이 아니면 title, thumbnail_subtitle, caption, thumbnail_scene_prompt는 가능한 한 유지하세요.\n"
+        )
+        rewritten = _extract_json_object(
+            self._generate_text(
+                "\n".join(
+                    [
+                        f"주제: {topic}",
+                        f"재작성 대상: {target_summary}",
+                        f"현재 기획안: {json.dumps(payload, ensure_ascii=False)}",
+                        f"최종 하드 블로커: {json.dumps(hard_blockers, ensure_ascii=False)}",
+                    ]
+                ),
+                thinking_level="high",
+                system_instruction=system_instruction,
+                cache_key=None,
+            )
+        )
+        return self._normalize_brief_payload(topic, rewritten, fallback=payload)
 
     def _normalize_brief_payload(
         self,
@@ -874,14 +1398,38 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             fallback=f"{normalized_payload['title']} 에피소드를 준비했습니다.",
         )
         normalized_payload["hashtags"] = sanitize_public_hashtags(normalized_payload.get("hashtags", []))
-        normalized_payload["image_prompt"] = str(normalized_payload.get("image_prompt", "")).strip() or (
-            "Korean digital webtoon style, bold clean outlines, vibrant colors, "
-            "expressive exaggerated facial expressions, dynamic poses, "
-            "anthropomorphic cats walking upright on two legs using front paws as hands, "
-            "manga-style emotion effects, detailed background"
-        )
+        normalized_payload["image_prompt"] = DEFAULT_IMAGE_PROMPT
         normalized_payload["thumbnail_scene_prompt"] = str(normalized_payload.get("thumbnail_scene_prompt", "")).strip()
-        normalized_payload["character_notes"] = str(normalized_payload.get("character_notes", "")).strip()
+        normalized_payload["character_notes"] = DEFAULT_CHARACTER_NOTES
+        # Normalize new visual direction fields
+        raw_outfit = normalized_payload.get("outfit_plan", {})
+        if not isinstance(raw_outfit, dict):
+            raw_outfit = {}
+        normalized_payload["outfit_plan"] = {
+            "kolla": {
+                "top": str((raw_outfit.get("kolla") or {}).get("top", "")).strip(),
+                "bottom": str((raw_outfit.get("kolla") or {}).get("bottom", "")).strip(),
+            },
+            "zero": {
+                "top": str((raw_outfit.get("zero") or {}).get("top", "")).strip(),
+                "bottom": str((raw_outfit.get("zero") or {}).get("bottom", "")).strip(),
+            },
+        }
+        raw_prop_registry = normalized_payload.get("prop_registry", {})
+        normalized_payload["prop_registry"] = (
+            {str(k).strip(): str(v).strip() for k, v in raw_prop_registry.items() if str(k).strip() and str(v).strip()}
+            if isinstance(raw_prop_registry, dict)
+            else {}
+        )
+        raw_thumb_dir = normalized_payload.get("thumbnail_direction", {})
+        if not isinstance(raw_thumb_dir, dict):
+            raw_thumb_dir = {}
+        normalized_payload["thumbnail_direction"] = {
+            "shot": str(raw_thumb_dir.get("shot", "")).strip(),
+            "scene": str(raw_thumb_dir.get("scene", "")).strip(),
+            "background": str(raw_thumb_dir.get("background", "")).strip(),
+            "composition": str(raw_thumb_dir.get("composition", "Characters in lower 60%. Upper 40% clean for title.")).strip(),
+        }
         raw_panels = normalized_payload.get("panels", fallback.get("panels", []) if fallback else [])
         fallback_panels = fallback.get("panels", []) if fallback else []
         if len(raw_panels) > 6:
@@ -890,11 +1438,20 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
         for index, panel in enumerate(raw_panels[:6], start=1):
             fallback_panel = fallback_panels[index - 1] if index - 1 < len(fallback_panels) else {}
             speaker_dialogues = normalize_speaker_dialogues(panel)
+            if not any(block.get("dialogue_lines") for block in speaker_dialogues):
+                speaker_dialogues = _build_default_speaker_dialogues(
+                    int(panel.get("panel_no", index)),
+                    str(panel.get("story_role", "")).strip(),
+                )
             dialogue_lines = flatten_speaker_dialogues(speaker_dialogues)
             dialogue_lines = [line for line in dialogue_lines if line]
-            for line in dialogue_lines:
-                if len(line) > 40:
-                    logger.warning("패널 %d 대사가 40자 초과 (%d자): %s", index, len(line), line[:50])
+            if any(len(line) > 38 for line in dialogue_lines):
+                logger.warning("패널 %d 대사가 38자 초과하여 기본 대사로 대체합니다.", index)
+                speaker_dialogues = _build_default_speaker_dialogues(
+                    int(panel.get("panel_no", index)),
+                    str(panel.get("story_role", "")).strip(),
+                )
+                dialogue_lines = flatten_speaker_dialogues(speaker_dialogues)
             fallback_key_props = _normalize_panel_props(fallback_panel.get("key_props", []))
             fallback_carryover_props = _normalize_panel_props(fallback_panel.get("carryover_props", []))
             key_props = _normalize_panel_props(panel.get("key_props", []), fallback=fallback_key_props)
@@ -904,23 +1461,56 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             )
             carryover_props = _merge_prop_lists(carryover_props)
             key_props = _merge_prop_lists(key_props, carryover_props)
+            normalized_scene_prompt = _ensure_scene_prompt_mentions_props(
+                str(panel.get("scene_prompt", "")).strip(),
+                carryover_props,
+                prefix="Keep the same recurring props visible",
+            )
+            normalized_scene_prompt = _ensure_scene_prompt_mentions_props(
+                normalized_scene_prompt,
+                [prop for prop in key_props if prop not in carryover_props],
+                prefix="Show these key props clearly",
+            )
+            normalized_scene_prompt = _ensure_fixed_character_appearance(normalized_scene_prompt)
+            raw_direction = panel.get("direction", {})
+            if not isinstance(raw_direction, dict):
+                raw_direction = {}
+            panel_no = int(panel.get("panel_no", index))
+            default_comp = (
+                "Characters bottom-center. Speech bubble space top-left and top-right."
+                if panel_no % 2 == 1
+                else "Characters upper-center. Speech bubble space bottom-left and bottom-right."
+            )
+            direction = {
+                "shot": str(raw_direction.get("shot", "")).strip(),
+                "scene": str(raw_direction.get("scene", "")).strip(),
+                "background": str(raw_direction.get("background", "")).strip(),
+                "composition": str(raw_direction.get("composition", default_comp)).strip(),
+            }
             panels.append(
                 {
-                    "panel_no": int(panel.get("panel_no", index)),
+                    "panel_no": panel_no,
                     "story_role": str(panel.get("story_role", "")).strip(),
                     "location": str(panel.get("location", "")).strip(),
-                    "scene_prompt": str(panel.get("scene_prompt", "")).strip(),
+                    "scene_prompt": normalized_scene_prompt,
                     "key_props": key_props,
                     "carryover_props": carryover_props,
                     "speaker_dialogues": speaker_dialogues,
                     "dialogue_lines": dialogue_lines,
+                    "direction": direction,
                 }
             )
         while len(panels) < 6:
             logger.warning("LLM이 6개 미만의 패널을 반환하여 빈 패널을 추가합니다. (현재 %d개)", len(panels))
+            filler_no = len(panels) + 1
+            filler_comp = (
+                "Characters bottom-center. Speech bubble space top-left and top-right."
+                if filler_no % 2 == 1
+                else "Characters upper-center. Speech bubble space bottom-left and bottom-right."
+            )
             panels.append(
                 {
-                    "panel_no": len(panels) + 1,
+                    "panel_no": filler_no,
                     "story_role": "",
                     "location": "",
                     "scene_prompt": "",
@@ -928,6 +1518,7 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
                     "carryover_props": [],
                     "speaker_dialogues": [],
                     "dialogue_lines": [],
+                    "direction": {"shot": "", "scene": "", "background": "", "composition": filler_comp},
                 }
             )
         normalized_payload["episode_scope"] = _normalize_episode_scope(
@@ -965,6 +1556,8 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- 썸네일의 배경 구조, 서브로케이션, 대표 간판, 대표 소품 배치가 본문 1~6컷 어디에서라도 다시 등장하면 실패입니다.\n"
             "- 썸네일과 본문이 같은 구조적 지문을 공유하면 실패입니다. 천장 형태, 중앙 홀 구조, 복도/게이트 프레임, 카운터 타입, 바닥 패턴, 대표 간판 군집이 겹치면 중복입니다.\n"
             "- 썸네일과 panel 1의 캐릭터 포즈, 소품 배치, 시선 방향이 비슷하면 실패입니다.\n"
+            "- 썸네일은 정면 아이레벨의 단순 나란히 서기보다 더 분리된 티저 구도여야 합니다. 하이앵글/사선 establishing shot이 아니더라도 panel 1과 같은 카메라 감각이면 실패입니다.\n"
+            "- 이야기 흐름상 필요하지 않은데 썸네일이 두 캐릭터의 뒷모습 위주로만 구성되면 실패입니다. 얼굴과 눈이 읽혀야 합니다.\n"
             "- title이 길어서 설명문처럼 늘어지면 실패입니다. title은 짧은 핵심 문구여야 합니다.\n"
             "- thumbnail_subtitle은 title을 반복하지 말고, title 아래에 붙는 설명형 보조 문구여야 합니다.\n"
             '- episode_scope는 "single_location" 또는 "journey" 중 하나로 명확해야 합니다.\n'
@@ -986,21 +1579,40 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "- 같은 소품이 이어지는 panel은 scene_prompt에도 그 소품이 다시 직접 언급되어야 합니다.\n"
             "- 내용 흐름상 계속 들고 있거나 사용 중인 핵심 소품이 다음 컷에서 갑자기 다른 물건으로 바뀌면 실패입니다.\n"
             "- 연속 소품은 scene_prompt에도 다시 명시되어야 하며, 종류와 주된 색상과 사용 방식이 유지되어야 합니다.\n"
+            "- 반복 소품이 여러 컷에 나오면 같은 물건의 정체성이 유지되어야 합니다. 이름만 같은데 색상/형태/크기/방향이 달라지면 실패입니다.\n"
+            "- 같은 물건이라도 열린/닫힌 상태, 보이는 면, 도장/표시가 보여야 하는지 같은 실제 상태가 바뀌면 실패입니다.\n"
+            "- 같은 연속 소품의 물리적 상태가 손에 든 상태와 벨트/트레이/카운터 위 상태 사이에서 바뀌면, scene_prompt 안에 건네기/올려놓기/집어들기 같은 전이 행동이 명시되어 있어야 합니다. 전이 설명 없이 상태만 바뀌면 실패입니다.\n"
+            "- 각 panel의 scene_prompt가 두 캐릭터의 직립 이족보행 행동을 충분히 설명하지 못해 네 발 보행으로 오해될 수 있으면 실패입니다.\n"
+            "- 콜라와 제로의 상대 크기 차이는 머리 높이, 어깨선, 몸통 폭, 전신 실루엣 기준 모두에서 안정적으로 읽혀야 합니다. 특정 컷에서만 과도하게 벌어지거나 역전되면 실패입니다.\n"
+            "- 콜라가 더 크게 보인다는 이유로 근육질 상체, 보디빌더형 몸매, 과장된 벌크가 추가되면 실패입니다. 둘 다 자연스러운 참조 체형을 유지해야 합니다.\n"
+            "- 콜라의 검은 단색 털에 회색 줄무늬가 섞이거나, 제로의 갈색 눈이 노란색/호박색으로 바뀌면 실패입니다.\n"
+            "- scene_prompt에 지정된 손 방향(left/right paw), 들고 있는 주체, 가리키는 주체가 이미지에서 바뀌면 실패입니다.\n"
+            f"{CREATIVE_BRIEF_HUMOR_REVIEW_BLOCK}"
             "- speaker_dialogues는 콜라와 제로 대사가 섞이지 않아야 합니다.\n"
             "JSON 객체만 반환하세요.\n"
             '필드: "has_issues"(bool), "issues"(array), "rewrite_instruction"(string)\n'
         )
-        review = _extract_json_object(
-            self._generate_text(
-                f"주제: {topic}\n기획안: {json.dumps(payload, ensure_ascii=False)}",
-                thinking_level="high",
-                system_instruction=system_instruction,
-                cache_key="creative-brief-review-v2",
+        try:
+            review = _extract_json_object(
+                self._generate_text(
+                    f"주제: {topic}\n기획안: {json.dumps(payload, ensure_ascii=False)}",
+                    thinking_level="high",
+                    system_instruction=system_instruction,
+                    cache_key=None,
+                )
             )
-        )
+        except Exception as exc:
+            logger.warning("스토리 기획 검수 JSON 파싱 실패, 결정적 검수만으로 계속 진행합니다: %s", exc)
+            review = {"has_issues": False, "issues": [], "rewrite_instruction": ""}
         review["has_issues"] = bool(review.get("has_issues", False))
         review["issues"] = [str(issue).strip() for issue in review.get("issues", []) if str(issue).strip()]
         review["rewrite_instruction"] = str(review.get("rewrite_instruction", "")).strip()
+        deterministic_issues = _supplement_brief_review(payload)
+        for issue in deterministic_issues:
+            if issue not in review["issues"]:
+                review["issues"].append(issue)
+        if deterministic_issues:
+            review["has_issues"] = True
         return review
 
     def _rewrite_creative_brief(
@@ -1029,13 +1641,25 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
             "썸네일 대표 배경은 본문 특정 한 컷뿐 아니라 1~6 전체 어디에도 재등장하면 안 됩니다.\n"
             "썸네일과 본문은 구조적 지문까지 분리하세요. 천장 형태, 중앙 안내판 배치, 아트리움/복도/게이트 프레임, 카운터 구조, 바닥 패턴이 겹치지 않게 만드세요.\n"
             "썸네일과 패널 1은 캐릭터 포즈, 시선, 손동작, 소품 배치도 서로 다르게 만드세요.\n"
+            "썸네일은 가능하면 넓은 하이앵글 또는 사선 establishing shot으로 설계하고, panel 1과 같은 정면 아이레벨 나란히 서기 구도를 피하세요.\n"
+            "이야기 흐름상 꼭 필요한 후면/측후면이 아니면 썸네일을 뒷모습 위주로 설계하지 말고, 얼굴과 눈이 보이는 정면 또는 3/4 시점으로 다시 쓰세요.\n"
             "콜라는 썸네일부터 패널 6까지 모든 이미지에서 제로보다 항상 더 크게 읽혀야 합니다. 어느 컷에서도 같은 크기나 역전이 허용되지 않습니다.\n"
             "콜라와 제로의 상대 크기 비율은 썸네일부터 패널 6까지 같은 좁은 범위로 유지하세요. 특정 컷에서 콜라가 갑자기 지나치게 커지거나 제로가 지나치게 작아지면 실패입니다.\n"
+            "상대 크기 차이는 머리 높이, 어깨선, 몸통 폭, 전신 실루엣 기준 모두에서 읽혀야 합니다. 원근으로 한쪽만 과도하게 전경에 두지 마세요.\n"
+            "콜라가 더 크게 보여야 한다는 이유로 근육질 몸매나 과장된 벌크를 추가하지 말고, 참조 이미지처럼 자연스러운 일반 체형을 유지하세요.\n"
             "썸네일부터 패널 6까지 모든 이미지에서 두 캐릭터는 완전한 이족보행이어야 하며, 네 발 보행이나 앞발 체중 지지는 허용하지 않습니다.\n"
+            "콜라의 검은 단색 털에 회색 줄무늬가 섞이거나, 제로의 갈색 눈이 노란색/호박색으로 바뀌는 속성 혼합은 허용하지 않습니다.\n"
+            "scene_prompt에 left paw/right paw, holding, presenting, pointing 같은 행동 주체가 있으면 그 손 방향과 주체를 정확히 유지하세요.\n"
+            "이번 재작성에서도 생활형 개그 톤을 유지하세요. 각 패널의 대사는 평범한 절차 설명이 아니라 콜라의 허세/성급함과 제로의 걱정/태클이 부딪히는 말맛이 있어야 합니다.\n"
+            "마지막 컷은 단순 정리 멘트가 아니라 웃음 payoff가 있어야 합니다. 허세 붕괴, 역할 역전, 엉뚱한 결론 중 하나를 넣으세요.\n"
             "각 패널의 key_props에는 이번 컷에서 실제로 보이는 핵심 소품만 적으세요. 휴대품, 문서, 도구, 음식, 탈것 관련 오브젝트처럼 장면을 바꾸는 물건만 넣고, 배경 잡동사니까지 나열하지 마세요.\n"
             "각 패널의 carryover_props에는 이전 컷에서 이번 컷까지 동일 물건으로 이어져야 하는 소품만 적으세요. 없으면 빈 배열로 두세요.\n"
             "같은 소품이 이어지면 carryover_props의 이름은 이전 컷과 같은 표기를 그대로 재사용하세요. 여권을 여행서류, 티켓을 표, 캐리어를 가방처럼 바꿔 적지 마세요.\n"
             "carryover_props는 반드시 key_props에도 포함하고, scene_prompt에도 그 소품을 다시 적으세요.\n"
+            "반복 소품은 같은 물건의 정체성이 유지되도록 scene_prompt에 주된 색상, 형태, 휴대 상태를 함께 적으세요. 이름만 유지하고 다른 물건처럼 바꾸면 안 됩니다.\n"
+            "같은 연속 소품의 물리적 상태가 손에 든 상태와 벨트/트레이/카운터 위 상태 사이에서 바뀌면, scene_prompt 안에 건네기/올려놓기/집어들기 같은 전이 행동을 직접 적으세요. 전이 설명 없이 상태만 갑자기 바꾸면 안 됩니다.\n"
+            "특히 펼친 여권, 찍힌 도장, 손가락으로 가리키는 문서, 끌고 가는 캐리어처럼 상태와 동작이 중요한 소품은 열린/닫힌 상태, 보이는 면, 손동작을 구체적으로 적으세요.\n"
+            "각 panel은 두 캐릭터의 직립 이족보행이 자연스럽게 읽히도록 행동과 자세를 써야 합니다. 찾는 장면, 당황 장면, 카운터 장면이어도 네 발 자세를 떠올리게 쓰지 마세요.\n"
             "특정 주제 예시를 박아넣지 말고, 이번 이야기에서 실제로 쓰이는 소품명만 구조적으로 정리하세요.\n"
             "내용 흐름상 이어지는 핵심 소품은 다음 컷에서도 같은 물건으로 유지하세요. 여권이 티켓으로 바뀌거나, 같은 캐리어가 다른 가방으로 바뀌면 실패입니다.\n"
             "연속 소품이 유지되는 컷은 scene_prompt에 그 소품을 다시 적고, 종류와 주된 색상과 손에 든 상태를 유지하세요.\n"
@@ -1053,10 +1677,66 @@ class GeminiTextClient(_GeminiPromptCacheMixin):
                 ),
                 thinking_level="high",
                 system_instruction=system_instruction,
-                cache_key="creative-brief-rewrite-v2",
+                cache_key=None,
             )
         )
         return self._normalize_brief_payload(topic, rewritten, fallback=payload)
+
+    def revise_creative_brief_for_quality(
+        self,
+        topic: str,
+        payload: dict[str, Any],
+        *,
+        hard_blockers: list[str],
+        target_panel_numbers: list[int],
+        rewrite_thumbnail: bool,
+        full_episode_replan: bool = False,
+    ) -> dict[str, Any]:
+        issues = [str(item).strip() for item in hard_blockers if str(item).strip()]
+        target_panels = sorted({panel_no for panel_no in target_panel_numbers if 1 <= int(panel_no) <= 6})
+        target_text = ", ".join(str(panel_no) for panel_no in target_panels) or "없음"
+        rewrite_instruction = (
+            "최종 패키지 검수 하드 블로커를 반영해 기획안을 다시 조정하세요.\n"
+            f"- 썸네일 재기획 필요: {'예' if rewrite_thumbnail else '아니오'}\n"
+            f"- 우선 재기획 대상 패널: {target_text}\n"
+            f"- 전체 에피소드 재기획 필요: {'예' if full_episode_replan else '아니오'}\n"
+            "- 대상이 아닌 패널은 가능한 한 기존 흐름, 대사, 소품 연속성을 유지하세요.\n"
+            "- 대상 패널은 기존 장면 복제나 같은 배경 변형판을 피하고, 장소 구조와 사건 비트를 분명히 바꾸세요.\n"
+            "- 패널 4~6처럼 후반부가 막힌 경우, 해결과 마무리가 실제로 전개되도록 location과 scene_prompt를 다시 써야 합니다.\n"
+            "- 하드 블로커에 나온 텍스트 오탈자, 배경 재사용, 캐릭터 비율 붕괴, 소품 연속성, journey 진행 정체를 직접 해소해야 합니다.\n"
+        )
+        review = {
+            "has_issues": bool(issues),
+            "issues": issues,
+            "rewrite_instruction": rewrite_instruction,
+        }
+        rewritten = self._rewrite_creative_brief(topic, payload, review)
+        if full_episode_replan:
+            return rewritten
+
+        merged = dict(payload)
+        if rewrite_thumbnail:
+            for key in (
+                "title",
+                "thumbnail_subtitle",
+                "caption",
+                "scope_summary",
+                "episode_scope",
+                "subtitle_scope",
+                "thumbnail_scene_prompt",
+                "image_prompt",
+                "character_notes",
+            ):
+                merged[key] = rewritten.get(key, merged.get(key))
+
+        rewritten_panels = {int(panel.get("panel_no", 0) or 0): panel for panel in rewritten.get("panels", [])}
+        merged["panels"] = [
+            rewritten_panels.get(int(panel.get("panel_no", 0) or 0), panel)
+            if int(panel.get("panel_no", 0) or 0) in target_panels
+            else panel
+            for panel in payload.get("panels", [])
+        ]
+        return self._normalize_brief_payload(topic, merged, fallback=payload)
 
     def _normalize_korean_dialogues(self, panels: list[dict[str, Any]]) -> list[dict[str, Any]]:
         flattened = [line for panel in panels for line in panel.get("dialogue_lines", [])]
@@ -1395,11 +2075,11 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
             "단, 장면 이해에 핵심인 안내어(예: 출구, 층수, 호수, 게이트, 통로 번호, 가격, 상태 표기)는 bars/icons로 대체하지 말고 짧고 읽을 수 있는 실제 단어로 남겨야 합니다.\n"
             "철자를 정확히 확신할 수 없는 비핵심 배경 텍스트는 지우거나 blank bars/icons로 단순화하라고 제안하세요. 억지 복원은 금지합니다.\n"
             "장소 종류와 무관하게 표지판 하나당 큰 라벨 하나를 우선합니다. 여러 줄 미세 텍스트가 보이면 거의 항상 단순화 대상으로 간주하세요.\n"
-            "핵심 표지판은 가능하면 단일 단어 또는 매우 짧은 2단어 라벨로 제안하세요. 예: 'INFO', 'EXIT', 'OPEN', 'TICKET', 'Gate A12', 'Aisle 3'.\n"
+            "핵심 표지판은 가능하면 단일 단어 또는 매우 짧은 2단어 라벨 1~2개만 제안하세요. 예: 'INFO', 'FLIGHTS', 'EXIT', 'TICKET'.\n"
             "correct 필드는 긴 설명문이 아니라 최종 화면에 남길 짧은 텍스트 또는 아주 짧은 편집 지시만 적으세요. 한 항목당 최대 12단어입니다.\n"
             "correct 필드는 가능하면 1~3개 단어, 최대 한 줄로 제한하세요. 긴 문장 설명이나 괄호 속 해설은 금지합니다.\n"
-            "전광판/디지털 화면은 'INFO', 'Gate A12', 'On Time'처럼 헤더 1개와 짧은 행 1~3개만 제안하세요.\n"
-            "문서/여권/티켓은 'DOCUMENT', 'NAME', 'ID'처럼 큰 라벨 1~3개만 제안하고 나머지는 blank lines로 두라고 하세요.\n"
+            "전광판/디지털 화면은 'INFO', 'FLIGHTS'처럼 헤더 1개와 짧은 보조 라벨 최대 1개만 제안하세요.\n"
+            "문서/여권/티켓은 'PASSPORT' 또는 'DOCUMENT'처럼 큰 라벨 1개를 우선하고, 꼭 필요할 때만 최대 2개까지만 제안하세요.\n"
             "도장/스탬프는 'STAMP' 같은 짧은 라벨과 날짜 한 줄만 제안하세요. 원형 둘레의 미세문구는 금지입니다.\n"
             "버튼/키오스크/UI 미세문구는 icons only, blank bars only, one short label 같은 짧은 지시로 제안하세요.\n"
             "JSON 객체만 반환하세요.\n"
@@ -1448,7 +2128,8 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
             "- 콜라는 제로보다 약간 더 크게 보여야 합니다.\n"
             "- 콜라가 제로와 비슷한 크기이거나 더 작아 보이면 오류입니다. 머리, 몸통, 전체 키 기준으로 콜라가 더 크게 읽혀야 합니다.\n"
             "- 이 크기 규칙은 썸네일부터 패널 6까지 모든 컷에 동일하게 적용된다고 가정하고 검사하세요. 어느 컷에서도 제로가 더 크거나 같게 읽히면 오류입니다.\n"
-            "- 또한 상대 크기 비율은 시리즈 전체에서 거의 같은 좁은 범위로 유지되어야 합니다. 콜라가 갑자기 과도하게 커지거나 제로가 과도하게 작아져 대략 10~15% 범위를 크게 벗어나면 오류입니다.\n"
+            "- 또한 상대 크기 비율은 시리즈 전체에서 거의 같은 좁은 범위로 유지되어야 합니다. 목표는 약 12%이며 허용 범위는 8~15%입니다. 콜라가 18% 이상 커 보이거나 제로가 너무 작아지면 오류입니다.\n"
+            "- 콜라가 더 크다는 이유로 근육질 상체, 과장된 벌크, 보디빌더형 몸매로 그려지면 오류입니다. 둘 다 참조 이미지처럼 자연스러운 일반 체형이어야 합니다.\n"
             "- 두 캐릭터는 의인화된 이족보행 캐릭터여야 합니다. 서 있거나 걷는 장면에서 네 발로 서 있으면 오류입니다.\n"
             "- 앞발이 바닥을 딛고 체중을 지탱하는 일반 동물형 자세는 오류입니다.\n"
             "- 앉아 있는 장면이어도 골반이 좌석에 닿고 상체는 사람처럼 세워져 있어야 하며, 앞발을 손처럼 쓰는 의인화 자세가 보여야 합니다.\n"
@@ -1460,6 +2141,9 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
             "- 스티커처럼 붙은 얼굴, 말풍선 옆 반응 컷인, 작은 복제 캐릭터, 뒷모습 분신도 전부 추가 캐릭터로 간주합니다.\n"
             "- 한 장 안에 같은 장면이 위아래 또는 좌우로 반복되거나, 두 컷이 합쳐진 것처럼 보이면 오류입니다.\n"
             "- 하나의 이미지가 만화 컷 여러 개로 분할되어 있거나, 같은 캐릭터 쌍이 두 번 보이면 오류입니다.\n"
+            "- 손/팔/앞다리 개수는 해부학적으로 자연스러워야 합니다. 한 캐릭터에 손처럼 보이는 앞발이 3개 이상 보이거나, 여분의 팔/다리/발가락 덩어리가 보이면 오류입니다.\n"
+            "- 반대로 한쪽 팔/앞발이 통째로 사라져 있어야 할 손동작이 구현되지 않거나, 어깨에서 팔이 끊긴 것처럼 보이면 오류입니다.\n"
+            "- scene_prompt가 지정한 손 방향과 소품 소유 주체를 지켜야 합니다. 잘못된 캐릭터가 소품을 들거나, 같은 소품이 두 손/두 캐릭터에 중복으로 보이면 오류입니다.\n"
             "- scene_prompt에 들어 있는 핵심 장소/행동 단서가 실제 이미지 배경에 반영되어야 합니다. 주제와 무관한 일반 풍경이면 오류입니다.\n"
             "- scene_prompt가 특정 소품, 손동작, 물건 상호작용을 지정하면 그대로 보여야 합니다. 캐리어, 가방, 표, 지도, 여권, 휴대폰 등 핵심 소품을 다른 물건으로 바꾸면 오류입니다.\n"
             "- scene_prompt에 이전 컷 연속 소품 정보가 포함되어 있다면 그 소품을 같은 종류와 비슷한 주된 색상으로 유지해야 합니다. 여권이 티켓으로, 캐리어가 다른 가방으로, 문서철이 지도나 휴대폰으로 바뀌면 오류입니다.\n"
@@ -1471,6 +2155,7 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
             '"duplicate_character_detected"(bool), "upper_margin_character_detected"(bool), '
             '"quadruped_detected"(bool), "quadruped_subjects"(array), "upright_pose_ok"(bool), '
             '"forepaws_used_as_hands_ok"(bool), "unsafe_surface_pose_detected"(bool), "reference_like_copy_detected"(bool), '
+            '"extra_limb_detected"(bool), "missing_limb_detected"(bool), "action_owner_ok"(bool), "left_right_action_ok"(bool), '
             '"cutin_or_sticker_detected"(bool), "partial_body_duplicate_detected"(bool)\n'
             "문제가 없으면 has_issues=false, issues=[], edit_instruction=''로 반환하세요.\n"
         )
@@ -1506,6 +2191,10 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
         payload["forepaws_used_as_hands_ok"] = bool(payload.get("forepaws_used_as_hands_ok", True))
         payload["unsafe_surface_pose_detected"] = bool(payload.get("unsafe_surface_pose_detected", False))
         payload["reference_like_copy_detected"] = bool(payload.get("reference_like_copy_detected", False))
+        payload["extra_limb_detected"] = bool(payload.get("extra_limb_detected", False))
+        payload["missing_limb_detected"] = bool(payload.get("missing_limb_detected", False))
+        payload["action_owner_ok"] = bool(payload.get("action_owner_ok", True))
+        payload["left_right_action_ok"] = bool(payload.get("left_right_action_ok", True))
         payload["cutin_or_sticker_detected"] = bool(payload.get("cutin_or_sticker_detected", False))
         payload["partial_body_duplicate_detected"] = bool(payload.get("partial_body_duplicate_detected", False))
         payload["issues"] = [str(issue).strip() for issue in payload.get("issues", []) if str(issue).strip()]
@@ -1528,6 +2217,10 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
             or not payload["forepaws_used_as_hands_ok"]
             or payload["unsafe_surface_pose_detected"]
             or payload["reference_like_copy_detected"]
+            or payload["extra_limb_detected"]
+            or payload["missing_limb_detected"]
+            or not payload["action_owner_ok"]
+            or not payload["left_right_action_ok"]
             or payload["cutin_or_sticker_detected"]
             or payload["partial_body_duplicate_detected"]
         )
@@ -1539,6 +2232,8 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
                 "Keep Kolla visibly larger than Zero in every shot in overall body scale, head size, torso mass, and silhouette so Kolla never reads as the smaller or equal-sized character. "
                 "Keep that size gap stable at about ten to fifteen percent rather than letting Kolla become dramatically oversized or Zero become tiny. "
                 "Keep both characters anthropomorphic and upright on two legs only, with forepaws used as hands rather than front legs. "
+                "Keep exactly one natural left forelimb and one natural right forelimb for each protagonist, with no extra hands, no duplicated paws, and no missing arm. "
+                "Honor the requested prop owner and left-versus-right paw interaction exactly so the correct character holds or points with the correct paw. "
                 "Do not allow any quadruped pose, weight-bearing forepaw pose, non-walkable-prop standing pose, or upper-margin duplicate character. "
                 "Keep recurring props consistent with the scene context instead of swapping passports, tickets, bags, maps, phones, or document folders to different object types. "
                 "If belts, rails, machinery, stairs, or moving equipment appear, keep both protagonists on the proper walking surface beside them rather than on top of the equipment. Match the requested scene and location cues, "
@@ -1557,21 +2252,25 @@ class GeminiOcrClient(_GeminiPromptCacheMixin):
             "첫 번째 이미지는 현재 생성된 웹툰 이미지이고, 뒤이어 제공되는 이미지는 반드시 따라야 하는 캐릭터 참조 이미지들입니다.\n"
             "현재 이미지의 콜라와 제로가 참조 이미지의 동일 캐릭터와 외형적으로 일치하는지 검사하세요.\n"
             "\n"
-            "중요: 심각한 정체성 오류만 보고하세요. 다음은 오류가 아닙니다:\n"
-            "- 미세한 색조 차이 (귀 안쪽이 갈색 vs 분홍 등)\n"
-            "- 무늬의 단순화나 스타일 변형 (줄무늬가 소용돌이 대신 물결형 등)\n"
-            "- 그림체나 렌더링 스타일의 자연스러운 차이\n"
-            "\n"
+            "중요: 참조 이미지의 정체성은 강하게 유지되어야 합니다. 색상, 무늬, 얼굴형, 눈색이 눈에 띄게 달라지면 오류입니다.\n"
             "실제 오류로 보고해야 하는 경우:\n"
-            "- 콜라가 검은색이 아니거나, 제로가 회색 줄무늬가 아닌 경우 (전혀 다른 색상)\n"
+            "- 콜라가 참조의 매우 짙은 검은 단색이 아니라 남색, 청회색, 보랏빛 검정, 먹색처럼 다른 계열로 보이는 경우\n"
+            "- 제로가 참조의 밝은 회색+진한 회색 태비 소용돌이 무늬가 아니라 다른 색상/다른 패턴으로 보이는 경우\n"
             "- 캐릭터 수가 2마리가 아닌 경우 (중복, 누락, 추가 캐릭터)\n"
             "- 콜라와 제로의 좌우 위치가 바뀐 경우 (콜라=왼쪽, 제로=오른쪽)\n"
             "- 캐릭터가 고양이가 아닌 다른 동물로 보이는 경우\n"
-            "- 콜라의 눈이 노란색이 아니거나, 제로의 눈 색이 완전히 다른 경우\n"
+            "- 콜라의 눈이 노란색이 아니거나, 제로의 눈 색이 갈색이 아닌 경우\n"
+            "- 콜라의 얼굴형이나 제로의 얼굴형이 참조보다 확연히 길어지거나 각져서 다른 캐릭터처럼 보이는 경우\n"
+            "- 콜라가 더 크다는 이유로 근육질 상체, 과장된 벌크, 보디빌더형 체형으로 변한 경우\n"
             "- 콜라가 제로보다 작거나 비슷하게 읽히는 경우\n"
             "- 썸네일부터 패널 6까지 어느 컷이든 콜라가 제로보다 작거나 비슷하게 읽히는 경우\n"
             "- 썸네일부터 패널 6까지 상대 크기 비율이 갑자기 무너져 콜라가 과도하게 커지거나 제로가 과도하게 작아진 경우\n"
             "- 네 발 보행, 앞발 체중 지지, 일반 동물형 달리기, 벨트/레일/기계 상판 위 탑승처럼 의인화 규칙이 무너진 경우\n"
+            "- 손/앞발/팔 개수가 비정상적으로 많아 보이는 경우 (예: 손처럼 보이는 앞발이 3개 이상)\n"
+            "- 손/앞발/팔이 하나 빠져 보이거나, 있어야 할 팔이 끊긴 것처럼 사라져 해부학적으로 부자연스러운 경우\n"
+            "- scene_prompt에서 지정한 소품 소유 주체나 left/right paw 방향이 뒤바뀐 경우\n"
+            "- 선글라스, 모자, 장신구처럼 참조 이미지에 없는 액세서리가 추가되어 얼굴 특징이나 눈을 가리는 경우\n"
+            "- 배경 인간 인물이 주인공보다 크거나 전면에 나와 시선을 빼앗는 경우\n"
             "- scene_prompt에 명시된 연속 소품이 이전 컷과 다른 물건으로 바뀌어 캐릭터 행동 연속성이 깨진 경우\n"
             "\n"
             "JSON 객체만 반환하세요.\n"
@@ -1684,6 +2383,7 @@ class GeminiImageClient:
         edit_image_mime_type: str | None = None,
         max_retries: int = 3,
     ) -> tuple[bytes, str, str]:
+        prompt = _compact_image_prompt_for_model(prompt, self.settings.image_model)
         normalized_reference_images = list(reference_images or [])
         reference_image_paths = list(reference_image_paths or [])
         total_references = len(normalized_reference_images) or len(reference_image_paths)
@@ -1724,8 +2424,25 @@ class GeminiImageClient:
                 total_references=total_references,
                 has_edit_image=edit_image_bytes is not None,
             )
+            if (
+                model_name.startswith("gemini-2.5")
+                and edit_image_bytes is None
+                and total_references > 2
+                and attempt == 1
+            ):
+                max_reference_inputs = 2
             contents = build_contents(max_reference_inputs=max_reference_inputs)
             _throttle_api_call()
+            logger.warning(
+                "이미지 생성 호출 시작 (모델 %s, 시도 %d/%d, refs=%d/%d, pruned=%s, prompt_len=%d)",
+                model_name,
+                attempt,
+                max_retries,
+                len(contents) - 1 - (1 if edit_image_bytes is not None else 0),
+                total_references,
+                max_reference_inputs is not None,
+                len(prompt),
+            )
             try:
                 response = self.client.models.generate_content(
                     model=model_name,
@@ -1772,6 +2489,7 @@ class GeminiImageClient:
 
             if image_bytes is not None:
                 self.last_generation_model = model_name
+                logger.warning("이미지 생성 응답 수신 (모델 %s, 시도 %d/%d)", model_name, attempt, max_retries)
                 if attempt > 1:
                     logger.info("이미지 생성 성공 (모델 %s, 시도 %d/%d)", model_name, attempt, max_retries)
                 return image_bytes, mime_type, "\n".join(text_parts).strip()
@@ -1799,14 +2517,12 @@ class GeminiImageClient:
 
 class GoogleWorkspaceClient:
     DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
-    SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets"
-    SCOPES = [DRIVE_SCOPE, SHEETS_SCOPE]
+    SCOPES = [DRIVE_SCOPE]
 
     def __init__(self, settings: WebtoonSettings, *, interactive_auth: bool = False) -> None:
         self.settings = settings
         self.interactive_auth = interactive_auth
         self._drive_service = None
-        self._sheets_service = None
         self._creds = self._load_user_credentials()
 
     def _load_user_credentials(self) -> Credentials:
@@ -1860,12 +2576,6 @@ class GoogleWorkspaceClient:
             self._drive_service = build("drive", "v3", credentials=self._creds, cache_discovery=False)
         return self._drive_service
 
-    @property
-    def sheets_service(self):
-        if self._sheets_service is None:
-            self._sheets_service = build("sheets", "v4", credentials=self._creds, cache_discovery=False)
-        return self._sheets_service
-
     def smoke_test_drive(self) -> dict[str, Any]:
         root = (
             self.drive_service.files()
@@ -1886,21 +2596,6 @@ class GoogleWorkspaceClient:
             make_public=False,
         )
         return {"root": root, "smoke_folder": smoke_folder, "uploaded_marker": marker}
-
-    def smoke_test_sheets(self) -> dict[str, Any]:
-        metadata = (
-            self.sheets_service.spreadsheets()
-            .get(spreadsheetId=self.settings.google_sheets_spreadsheet_id, fields="properties.title,sheets.properties.title")
-            .execute()
-        )
-        headers = ["timestamp", "service", "status"]
-        row = {
-            "timestamp": datetime.now(timezone.utc).replace(microsecond=0).isoformat() + "Z",
-            "service": "sheets",
-            "status": "ok",
-        }
-        append_result = self.append_row("smoke_tests", headers, row)
-        return {"metadata": metadata, "append_result": append_result}
 
     def ensure_folder(self, parent_id: str, folder_name: str) -> dict[str, Any]:
         query = (
@@ -2005,58 +2700,6 @@ class GoogleWorkspaceClient:
     def make_public_download_url(self, file_id: str) -> str:
         return f"https://drive.usercontent.google.com/download?id={file_id}&export=download"
 
-    def ensure_sheet(self, sheet_name: str, headers: list[str]) -> None:
-        metadata = (
-            self.sheets_service.spreadsheets()
-            .get(spreadsheetId=self.settings.google_sheets_spreadsheet_id, fields="sheets.properties.title")
-            .execute()
-        )
-        titles = {sheet["properties"]["title"] for sheet in metadata.get("sheets", [])}
-        if sheet_name not in titles:
-            self.sheets_service.spreadsheets().batchUpdate(
-                spreadsheetId=self.settings.google_sheets_spreadsheet_id,
-                body={"requests": [{"addSheet": {"properties": {"title": sheet_name}}}]},
-            ).execute()
-            self.sheets_service.spreadsheets().values().update(
-                spreadsheetId=self.settings.google_sheets_spreadsheet_id,
-                range=f"{sheet_name}!A1",
-                valueInputOption="RAW",
-                body={"values": [headers]},
-            ).execute()
-            return
-
-        first_row = (
-            self.sheets_service.spreadsheets()
-            .values()
-            .get(spreadsheetId=self.settings.google_sheets_spreadsheet_id, range=f"{sheet_name}!1:1")
-            .execute()
-        )
-        values = first_row.get("values", [])
-        if not values:
-            self.sheets_service.spreadsheets().values().update(
-                spreadsheetId=self.settings.google_sheets_spreadsheet_id,
-                range=f"{sheet_name}!A1",
-                valueInputOption="RAW",
-                body={"values": [headers]},
-            ).execute()
-
-    def append_row(self, sheet_name: str, headers: list[str], row: dict[str, Any]) -> dict[str, Any]:
-        self.ensure_sheet(sheet_name, headers)
-        ordered_values = [row.get(header, "") for header in headers]
-        result = (
-            self.sheets_service.spreadsheets()
-            .values()
-            .append(
-                spreadsheetId=self.settings.google_sheets_spreadsheet_id,
-                range=f"{sheet_name}!A1",
-                valueInputOption="USER_ENTERED",
-                insertDataOption="INSERT_ROWS",
-                body={"values": [ordered_values]},
-            )
-            .execute()
-        )
-        return result
-
     def auth_status(self) -> dict[str, Any]:
         token_file = self.settings.google_oauth_token_file
         return {
@@ -2066,194 +2709,12 @@ class GoogleWorkspaceClient:
             "scopes": self.SCOPES,
         }
 
-
-_CATBOX_UPLOAD_URL = "https://catbox.moe/user/api.php"
-
-
-def upload_image_for_instagram(image_bytes: bytes, filename: str = "image.jpg") -> str:
-    """Upload image to catbox.moe and return a direct public URL.
-
-    Google Drive URLs have cross-origin-resource-policy: same-site which
-    prevents Instagram's servers from fetching the image.  This helper hosts
-    the image on a publicly accessible CDN instead.
-    """
-    mime_type = "image/jpeg" if filename.endswith(".jpg") else "image/png"
-    with httpx.Client(timeout=60.0) as client:
-        response = client.post(
-            _CATBOX_UPLOAD_URL,
-            data={"reqtype": "fileupload"},
-            files={"fileToUpload": (filename, image_bytes, mime_type)},
-        )
-    if response.status_code != 200 or not response.text.startswith("https://"):
-        raise RuntimeError(f"이미지 호스팅 업로드 실패: status={response.status_code} body={response.text[:200]}")
-    return response.text.strip()
-
-
-class InstagramGraphClient:
-    def __init__(self, settings: WebtoonSettings) -> None:
-        self.settings = settings
-        self.client = httpx.Client(
-            base_url=f"https://graph.facebook.com/{settings.instagram_graph_api_version}",
-            timeout=60.0,
-        )
-
-    def _get(self, path: str, **params: Any) -> dict[str, Any]:
-        response = self.client.get(path, params={"access_token": self.settings.instagram_access_token, **params})
-        if response.is_error:
-            raise RuntimeError(self._build_error_message(response))
-        return response.json()
-
-    def _post(self, path: str, **data: Any) -> dict[str, Any]:
-        response = self.client.post(path, data={"access_token": self.settings.instagram_access_token, **data})
-        if response.is_error:
-            raise RuntimeError(self._build_error_message(response))
-        return response.json()
-
-    @staticmethod
-    def _build_error_message(response: httpx.Response) -> str:
-        try:
-            payload = response.json()
-        except ValueError:
-            payload = response.text
-        return f"Instagram API {response.status_code}: {payload}"
-
-    def smoke_test(self) -> dict[str, Any]:
-        return self._get(f"/{self.settings.instagram_business_account_id}", fields="id,username")
-
-    def create_media_container(self, image_url: str, caption: str) -> str:
-        payload = self._post(
-            f"/{self.settings.instagram_business_account_id}/media",
-            image_url=image_url,
-            caption=caption,
-        )
-        creation_id = payload.get("id")
-        if not creation_id:
-            raise RuntimeError(f"Instagram media container creation failed: {payload}")
-        return creation_id
-
-    def create_carousel_item_container(self, image_url: str) -> str:
-        payload = self._post(
-            f"/{self.settings.instagram_business_account_id}/media",
-            image_url=image_url,
-            is_carousel_item=True,
-        )
-        creation_id = payload.get("id")
-        if not creation_id:
-            raise RuntimeError(f"Instagram carousel item creation failed: {payload}")
-        return creation_id
-
-    def create_carousel_container(self, children: list[str], caption: str) -> str:
-        payload = self._post(
-            f"/{self.settings.instagram_business_account_id}/media",
-            media_type="CAROUSEL",
-            children=",".join(children),
-            caption=caption,
-        )
-        creation_id = payload.get("id")
-        if not creation_id:
-            raise RuntimeError(f"Instagram carousel container creation failed: {payload}")
-        return creation_id
-
-    def get_container_status(self, creation_id: str) -> dict[str, Any]:
-        return self._get(f"/{creation_id}", fields="id,status_code,status")
-
-    def publish_media(self, creation_id: str) -> dict[str, Any]:
-        return self._post(
-            f"/{self.settings.instagram_business_account_id}/media_publish",
-            creation_id=creation_id,
-        )
-
-    def publish_image(
-        self,
-        image_url: str,
-        caption: str,
-        *,
-        poll_interval_seconds: int = 5,
-        poll_timeout_seconds: int = 120,
-    ) -> dict[str, Any]:
-        creation_id = self.create_media_container(image_url=image_url, caption=caption)
-
-        started_at = time.monotonic()
-        while True:
-            status = self.get_container_status(creation_id)
-            status_code = status.get("status_code")
-            if status_code == "FINISHED":
-                break
-            if status_code == "ERROR":
-                raise RuntimeError(f"Instagram media container processing failed: {status}")
-            if time.monotonic() - started_at > poll_timeout_seconds:
-                raise TimeoutError(f"Timed out waiting for Instagram media container: {status}")
-            time.sleep(poll_interval_seconds)
-
-        publish_result = self.publish_media(creation_id)
-        publish_id = publish_result.get("id")
-        permalink = {}
-        if publish_id:
-            permalink = self._get(f"/{publish_id}", fields="id,permalink")
-        return {
-            "creation_id": creation_id,
-            "publish_result": publish_result,
-            "media": permalink,
-        }
-
-    def publish_carousel(
-        self,
-        image_urls: list[str],
-        caption: str,
-        *,
-        poll_interval_seconds: int = 5,
-        poll_timeout_seconds: int = 180,
-    ) -> dict[str, Any]:
-        if not image_urls:
-            raise ValueError("image_urls must not be empty")
-
-        child_creation_ids = [self.create_carousel_item_container(image_url) for image_url in image_urls]
-
-        started_at = time.monotonic()
-        for creation_id in child_creation_ids:
-            while True:
-                status = self.get_container_status(creation_id)
-                status_code = status.get("status_code")
-                if status_code == "FINISHED":
-                    break
-                if status_code == "ERROR":
-                    raise RuntimeError(f"Instagram carousel item processing failed: {status}")
-                if time.monotonic() - started_at > poll_timeout_seconds:
-                    raise TimeoutError(f"Timed out waiting for Instagram carousel item: {status}")
-                time.sleep(poll_interval_seconds)
-
-        creation_id = self.create_carousel_container(child_creation_ids, caption=caption)
-
-        while True:
-            status = self.get_container_status(creation_id)
-            status_code = status.get("status_code")
-            if status_code == "FINISHED":
-                break
-            if status_code == "ERROR":
-                raise RuntimeError(f"Instagram carousel container processing failed: {status}")
-            if time.monotonic() - started_at > poll_timeout_seconds:
-                raise TimeoutError(f"Timed out waiting for Instagram carousel container: {status}")
-            time.sleep(poll_interval_seconds)
-
-        publish_result = self.publish_media(creation_id)
-        publish_id = publish_result.get("id")
-        permalink = {}
-        if publish_id:
-            permalink = self._get(f"/{publish_id}", fields="id,permalink")
-        return {
-            "creation_id": creation_id,
-            "child_creation_ids": child_creation_ids,
-            "publish_result": publish_result,
-            "media": permalink,
-        }
-
-
 def build_smoke_test_image_bytes() -> bytes:
     image = Image.new("RGB", (960, 540), color=(245, 245, 240))
     draw = ImageDraw.Draw(image)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     draw.text((48, 48), f"OCR SMOKE TEST {timestamp}", fill=(20, 20, 20))
-    draw.text((48, 120), "Drive Sheets Instagram", fill=(20, 20, 20))
+    draw.text((48, 120), "Drive Smoke", fill=(20, 20, 20))
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
     return buffer.getvalue()

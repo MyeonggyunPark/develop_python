@@ -9,7 +9,7 @@ from .clients import GoogleWorkspaceClient
 from .pipeline import run_webtoon_pipeline
 from .smoke_tests import run_smoke_tests
 
-DEFAULT_SMOKE_SERVICES = ("llm", "ocr", "image", "drive", "sheets", "instagram")
+DEFAULT_SMOKE_SERVICES = ("llm", "ocr", "image", "drive")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -22,7 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
     smoke_parser.add_argument(
         "--services",
         nargs="*",
-        choices=["llm", "ocr", "image", "drive", "sheets", "instagram"],
+        choices=["llm", "ocr", "image", "drive"],
         default=None,
         help="테스트할 서비스 목록",
     )
@@ -34,10 +34,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="토큰 파일 경로와 현재 상태만 출력",
     )
 
-    pipeline_parser = subparsers.add_parser("pipeline", help="이미지 생성부터 저장/게시까지 파이프라인 실행")
+    pipeline_parser = subparsers.add_parser("pipeline", help="이미지와 JSON 산출물을 생성해 Drive에 업로드")
     pipeline_parser.add_argument("--topic", required=True, help="웹툰 주제")
-    pipeline_parser.add_argument("--notes", default="", help="시트 notes 컬럼에 넣을 메모")
-    pipeline_parser.add_argument("--publish", action="store_true", help="Instagram 게시까지 실제 실행")
+    pipeline_parser.add_argument("--notes", default="", help="run metadata에 남길 메모")
 
     return parser
 
@@ -55,23 +54,11 @@ def _required_settings_fields(args: argparse.Namespace) -> set[str]:
             required.add("gemini_api_key")
         if "drive" in selected:
             required.add("google_drive_root_folder_id")
-        if "sheets" in selected:
-            required.add("google_sheets_spreadsheet_id")
-        if "instagram" in selected:
-            required.update(
-                {
-                    "instagram_access_token",
-                    "instagram_business_account_id",
-                }
-            )
         return required
 
     if args.command == "pipeline":
         required = set(WEBTOON_REQUIRED_FIELDS)
         required.discard("google_oauth_client_secret_file")
-        if not args.publish:
-            required.discard("instagram_access_token")
-            required.discard("instagram_business_account_id")
         return required
 
     return set()
@@ -98,7 +85,7 @@ def main() -> None:
             google_client = GoogleWorkspaceClient(settings, interactive_auth=True)
             result = google_client.auth_status()
     elif args.command == "pipeline":
-        result = run_webtoon_pipeline(settings, topic=args.topic, publish=args.publish, notes=args.notes)
+        result = run_webtoon_pipeline(settings, topic=args.topic, notes=args.notes)
     else:
         parser.error(f"Unknown command: {args.command}")
         return

@@ -9,7 +9,6 @@ from .clients import (
     GeminiImageClient,
     GeminiTextClient,
     GoogleWorkspaceClient,
-    InstagramGraphClient,
     build_smoke_test_image_bytes,
 )
 from .config import WebtoonSettings
@@ -33,7 +32,7 @@ def _run_step(results: dict[str, Any], name: str, action) -> None:
 
 
 def run_smoke_tests(settings: WebtoonSettings, services: list[str] | None = None) -> dict[str, Any]:
-    selected = set(services or ["llm", "ocr", "image", "drive", "sheets", "instagram"])
+    selected = set(services or ["llm", "ocr", "image", "drive"])
     results: dict[str, Any] = {
         "timestamp": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "services": {},
@@ -54,13 +53,5 @@ def run_smoke_tests(settings: WebtoonSettings, services: list[str] | None = None
         if google_client is None:
             google_client = GoogleWorkspaceClient(settings)
         _run_step(results, "drive", lambda: google_client.smoke_test_drive())
-
-    if "sheets" in selected:
-        if google_client is None:
-            google_client = GoogleWorkspaceClient(settings)
-        _run_step(results, "sheets", lambda: google_client.smoke_test_sheets())
-
-    if "instagram" in selected:
-        _run_step(results, "instagram", lambda: InstagramGraphClient(settings).smoke_test())
 
     return results

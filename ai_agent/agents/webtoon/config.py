@@ -14,12 +14,12 @@ DEFAULT_GOOGLE_OAUTH_TOKEN_FILE = REPO_ROOT / "agents" / "webtoon" / "secrets" /
 DEFAULT_LLM_MODEL = "gemini-3-flash-preview"
 DEFAULT_OCR_MODEL = "gemini-3-flash-preview"
 DEFAULT_OCR_EXTRACT_MODEL = DEFAULT_OCR_MODEL
-DEFAULT_IMAGE_MODEL = "gemini-2.5-flash-image"
+DEFAULT_IMAGE_MODEL = "gemini-3.1-flash-image-preview"
 DEFAULT_LLM_THINKING_LEVEL = "high"
 DEFAULT_OCR_THINKING_LEVEL = "high"
 DEFAULT_OCR_EXTRACT_THINKING_LEVEL = "high"
-DEFAULT_INSTAGRAM_GRAPH_VERSION = "v23.0"
-DEFAULT_MAX_CORRECTION_ATTEMPTS = 2
+DEFAULT_MAX_CORRECTION_ATTEMPTS = 1
+DEFAULT_MAX_STORY_REPLAN_ATTEMPTS = 1
 DEFAULT_API_PARALLELISM = 3
 DEFAULT_ENABLE_CONTEXT_CACHING = True
 DEFAULT_CONTEXT_CACHE_TTL = "3600s"
@@ -27,10 +27,7 @@ WEBTOON_REQUIRED_FIELDS = frozenset(
     {
         "google_oauth_client_secret_file",
         "google_drive_root_folder_id",
-        "google_sheets_spreadsheet_id",
         "gemini_api_key",
-        "instagram_access_token",
-        "instagram_business_account_id",
         "approval_default_user",
     }
 )
@@ -79,10 +76,7 @@ class WebtoonSettings:
     google_oauth_client_secret_file: Path
     google_oauth_token_file: Path
     google_drive_root_folder_id: str
-    google_sheets_spreadsheet_id: str
     gemini_api_key: str
-    instagram_access_token: str
-    instagram_business_account_id: str
     approval_default_user: str
     llm_model: str = DEFAULT_LLM_MODEL
     ocr_model: str = DEFAULT_OCR_MODEL
@@ -91,11 +85,11 @@ class WebtoonSettings:
     llm_thinking_level: str = DEFAULT_LLM_THINKING_LEVEL
     ocr_thinking_level: str = DEFAULT_OCR_THINKING_LEVEL
     ocr_extract_thinking_level: str = DEFAULT_OCR_EXTRACT_THINKING_LEVEL
-    instagram_graph_api_version: str = DEFAULT_INSTAGRAM_GRAPH_VERSION
     character_assets_dir: Path = REPO_ROOT / "agents" / "webtoon" / "assets" / "characters"
     font_assets_dir: Path = REPO_ROOT / "agents" / "webtoon" / "assets" / "fonts"
     font_file: Path | None = None
     max_correction_attempts: int = DEFAULT_MAX_CORRECTION_ATTEMPTS
+    max_story_replan_attempts: int = DEFAULT_MAX_STORY_REPLAN_ATTEMPTS
     api_parallelism: int = DEFAULT_API_PARALLELISM
     enable_context_caching: bool = DEFAULT_ENABLE_CONTEXT_CACHING
     context_cache_ttl: str = DEFAULT_CONTEXT_CACHE_TTL
@@ -124,25 +118,10 @@ class WebtoonSettings:
                 if "google_drive_root_folder_id" in required
                 else _read_env("GOOGLE_DRIVE_ROOT_FOLDER_ID")
             ),
-            google_sheets_spreadsheet_id=(
-                _read_required_env("GOOGLE_SHEETS_SPREADSHEET_ID")
-                if "google_sheets_spreadsheet_id" in required
-                else _read_env("GOOGLE_SHEETS_SPREADSHEET_ID")
-            ),
             gemini_api_key=(
                 _read_required_env_alias("GEMINI_API_KEY", "IMAGE_API_KEY")
                 if "gemini_api_key" in required
                 else _read_env_alias("GEMINI_API_KEY", "IMAGE_API_KEY")
-            ),
-            instagram_access_token=(
-                _read_required_env("INSTAGRAM_ACCESS_TOKEN")
-                if "instagram_access_token" in required
-                else _read_env("INSTAGRAM_ACCESS_TOKEN")
-            ),
-            instagram_business_account_id=(
-                _read_required_env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
-                if "instagram_business_account_id" in required
-                else _read_env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
             ),
             approval_default_user=(
                 _read_required_env("APPROVAL_DEFAULT_USER")
@@ -159,8 +138,6 @@ class WebtoonSettings:
                 _read_env("OCR_EXTRACT_THINKING_LEVEL", DEFAULT_OCR_EXTRACT_THINKING_LEVEL)
                 or DEFAULT_OCR_EXTRACT_THINKING_LEVEL
             ),
-            instagram_graph_api_version=_read_env("INSTAGRAM_GRAPH_API_VERSION", DEFAULT_INSTAGRAM_GRAPH_VERSION)
-            or DEFAULT_INSTAGRAM_GRAPH_VERSION,
             font_file=(
                 Path(_read_env("WEBTOON_FONT_FILE")).expanduser()
                 if _read_env("WEBTOON_FONT_FILE")
@@ -169,6 +146,16 @@ class WebtoonSettings:
             max_correction_attempts=max(
                 0,
                 int(_read_env("MAX_CORRECTION_ATTEMPTS", str(DEFAULT_MAX_CORRECTION_ATTEMPTS)) or DEFAULT_MAX_CORRECTION_ATTEMPTS),
+            ),
+            max_story_replan_attempts=max(
+                0,
+                int(
+                    _read_env(
+                        "MAX_STORY_REPLAN_ATTEMPTS",
+                        str(DEFAULT_MAX_STORY_REPLAN_ATTEMPTS),
+                    )
+                    or DEFAULT_MAX_STORY_REPLAN_ATTEMPTS
+                ),
             ),
             api_parallelism=max(
                 1,
